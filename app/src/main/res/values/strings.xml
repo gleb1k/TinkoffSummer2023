@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">TinkoffSummer2023</string>
+    <string name="sign_in">Sign in</string>
+    <string name="sign_up">Sign up</string>
+    <string name="catalog">Catalog</string>
+    <string name="search">Search</string>
+    <string name="points">Points</string>
+    <string name="cart">Cart</string>
+    <string name="profile">Profile</string>
+    <string name="add_to_cart">Add to Cart</string>
+    <string name="create_an_account">Create an account</string>
+    <string name="settings">Settings</string>
+</resources>
