@@ -1,4 +1,4 @@
-package com.main.tinkoffsummer2023.ui.theme
+package com.main.tinkoffsummer2023.ui.theme.base
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

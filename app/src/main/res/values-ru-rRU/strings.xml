@@ -1,4 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">TinkoffSummer2023</string>
+    <string name="sign_in">Вход в профиль</string>
+    <string name="sign_up">Создание аккаунта</string>
+    <string name="catalog">Каталог</string>
+    <string name="search">Поиск</string>
+    <string name="points">Баллы</string>
+    <string name="cart">Корзина</string>
+    <string name="profile">Профиль</string>
+    <string name="add_to_cart">Добавить в корзину</string>
+    <string name="settings">Настройки</string>
+    <string name="my_orders">Мои заказы</string>
 </resources>

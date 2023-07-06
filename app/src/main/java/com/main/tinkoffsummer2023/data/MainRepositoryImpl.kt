@@ -8,5 +8,4 @@ class MainRepositoryImpl @Inject constructor(
     private val api: MainApi,
 ) : MainRepository {
 
-
 }

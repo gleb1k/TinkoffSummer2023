@@ -7,7 +7,7 @@ import androidx.room.Query
 import com.main.tinkoffsummer2023.data.local.entity.ProductEntity
 
 @Dao
-interface ProductDao{
+interface ProductDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(item: ProductEntity)
