@@ -42,7 +42,7 @@ sealed class BottomScreen(
     object Orders : BottomScreen(
         route = "orders",
         name = R.string.my_orders,
-        icon = R.drawable.search
+        icon = R.drawable.box
     )
 
     object Catalog : BottomScreen(

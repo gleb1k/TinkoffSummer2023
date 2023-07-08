@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.IconButton
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
@@ -32,7 +32,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.main.tinkoffsummer2023.R
+import com.main.tinkoffsummer2023.ui.navigation.BottomScreen
 import com.main.tinkoffsummer2023.ui.screen.BaseTextFieldUi
+import com.main.tinkoffsummer2023.ui.screen.BaseTopAppBar
 import com.main.tinkoffsummer2023.ui.screen.GreenNextButton
 import com.main.tinkoffsummer2023.ui.theme.custom.CustomTheme
 import com.main.tinkoffsummer2023.ui.theme.custom.baseLightPalette
@@ -45,7 +47,7 @@ private fun SignInScreenActions(
 ) {
     LaunchedEffect(viewAction) {
         when (viewAction) {
-            SignInAction.NavigateToCatalog -> TODO()
+            SignInAction.NavigateToCatalog -> navController.navigate(BottomScreen.Catalog.route)
             null -> Unit
         }
     }
@@ -80,14 +82,11 @@ fun Content(
     Surface(color = CustomTheme.colors.primaryBackground) {
         Column(modifier = Modifier.fillMaxSize()) {
 
-            TopAppBar(
-                backgroundColor = CustomTheme.colors.secondaryBackground,
-                elevation = 8.dp,
-            ) {
+            BaseTopAppBar({
                 IconButton(onClick = {}) {
                     Icon(Icons.Filled.ArrowBack, "backIcon")
                 }
-            }
+            })
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -115,7 +114,7 @@ fun Content(
                         label = "Номер телефона или Email",
                         value = "",
                         //todo спросить у илюхи
-//                    onValueChange = eventHandler.invoke(SignUpEvent.OnQueryLoginChange),
+                        // onValueChange = eventHandler.invoke(SignUpEvent.OnQueryLoginChange),
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(R.drawable.user_filled),
@@ -173,7 +172,7 @@ fun Content(
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        androidx.compose.material.Text(
+                        Text(
                             text = "Войти",
                             fontFamily = FontFamily(Font(R.font.montserrat_bold)),
                             fontSize = 23.sp,
@@ -181,7 +180,9 @@ fun Content(
                             color = baseLightPalette.primaryText,
                             modifier = Modifier.weight(2f)
                         )
-                        GreenNextButton() {}
+                        GreenNextButton() {
+                            eventHandler.invoke(SignInEvent.OnSignInClick)
+                        }
                     }
                 }
             }

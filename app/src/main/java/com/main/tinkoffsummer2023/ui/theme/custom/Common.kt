@@ -17,6 +17,7 @@ data class Colors(
     val white: Color,
 
     val errorColor: Color,
+    val tertiaryColor : Color
 )
 
 data class Typography(

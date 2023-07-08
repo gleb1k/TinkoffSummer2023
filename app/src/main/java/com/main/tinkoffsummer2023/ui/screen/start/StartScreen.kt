@@ -35,6 +35,7 @@ import androidx.navigation.NavController
 import com.main.tinkoffsummer2023.R
 import com.main.tinkoffsummer2023.ui.navigation.BottomScreen
 import com.main.tinkoffsummer2023.ui.navigation.Screen
+import com.main.tinkoffsummer2023.ui.screen.BaseGreenButton
 import com.main.tinkoffsummer2023.ui.theme.custom.CustomTheme
 
 @Composable
@@ -126,24 +127,12 @@ fun Content(
                     style = CustomTheme.typography.base,
                 )
             }
-            Button(
-                onClick = { eventHandler.invoke(StartEvent.OnSignInClick) },
+            BaseGreenButton(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
-                shape = RoundedCornerShape(18.dp),
-                colors = ButtonDefaults.buttonColors(
-                    backgroundColor = CustomTheme.colors.secondaryBackground
-                )
-
-            ) {
-                Text(
-                    text = "Авторизоваться",
-                    fontWeight = FontWeight(700),
-                    fontFamily = FontFamily(Font(R.font.montserrat_regular)),
-                    fontSize = 20.sp
-                )
-            }
+                text = "Авторизоваться"
+            ) { eventHandler.invoke(StartEvent.OnSignInClick) }
             Row(
                 Modifier
                     .padding(vertical = 24.dp)

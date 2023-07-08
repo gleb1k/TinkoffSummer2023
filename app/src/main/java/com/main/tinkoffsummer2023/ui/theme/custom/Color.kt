@@ -12,7 +12,8 @@ internal val baseLightPalette = Colors(
     tintColor = Color(0xFF676767),
     white = Color(0xFFFFFFFF),
 
-    errorColor = Color(0xFFFF0000)
+    errorColor = Color(0xFFFF0000),
+    tertiaryColor = Color(0xFFCB6CE6)
 )
 
 
@@ -24,6 +25,7 @@ internal val baseDarkPalette = Colors(
     tintColor = Color.Magenta,
     white = Color(0xCC7A8A99),
 
-    errorColor = Color(0xFFFF6699)
+    errorColor = Color(0xFFFF6699),
+    tertiaryColor = Color(0xFFCB6CE6)
 )
 
