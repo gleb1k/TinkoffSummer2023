@@ -4,7 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.main.tinkoffsummer2023.R
 
-//хз?
+//todo хз?
 enum class Screens {
     Sign_up,
 }
@@ -13,6 +13,8 @@ enum class Screens {
 sealed class Screen(
     val route: String,
 ) {
+
+    // region auth
     object Start : Screen(
         route = "start"
     )
@@ -23,12 +25,37 @@ sealed class Screen(
 
     object SignIn : Screen(
         route = "sign_in",
+    )
+    // endregion
 
-        )
-
+    // region catalog
     object Product : Screen(
         route = "product",
     )
+
+    object Catalog : Screen(
+        route = "catalog",
+    )
+
+    object Filter : Screen(
+        route = "filter",
+    )
+    // endregion
+
+    // Profile
+    object Balance : Screen(
+        route = "balance"
+    )
+
+    object AboutApp : Screen(
+        route = "about_app"
+    )
+
+    object Settings : Screen(
+        route = "settings"
+    )
+    // endregion
+
 }
 
 sealed class BottomScreen(
@@ -45,8 +72,8 @@ sealed class BottomScreen(
         icon = R.drawable.box
     )
 
-    object Catalog : BottomScreen(
-        route = "catalog",
+    object Category : BottomScreen(
+        route = "category",
         name = R.string.catalog,
         icon = R.drawable.search
     )

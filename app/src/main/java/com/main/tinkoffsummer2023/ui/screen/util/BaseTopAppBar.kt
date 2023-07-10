@@ -1,4 +1,4 @@
-package com.main.tinkoffsummer2023.ui.screen
+package com.main.tinkoffsummer2023.ui.screen.util
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

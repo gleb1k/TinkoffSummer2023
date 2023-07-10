@@ -10,17 +10,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.Font
@@ -35,7 +31,7 @@ import androidx.navigation.NavController
 import com.main.tinkoffsummer2023.R
 import com.main.tinkoffsummer2023.ui.navigation.BottomScreen
 import com.main.tinkoffsummer2023.ui.navigation.Screen
-import com.main.tinkoffsummer2023.ui.screen.BaseGreenButton
+import com.main.tinkoffsummer2023.ui.screen.util.BaseGreenButton
 import com.main.tinkoffsummer2023.ui.theme.custom.CustomTheme
 
 @Composable
@@ -47,7 +43,7 @@ private fun StartScreenActions(
         when (viewAction) {
             StartAction.NavigateToSignIn -> navController.navigate(Screen.SignIn.route)
             StartAction.NavigateToSignUp -> navController.navigate(Screen.SignUp.route)
-            StartAction.NavigateToCatalog -> navController.navigate(BottomScreen.Catalog.route)
+            StartAction.NavigateToCatalog -> navController.navigate(BottomScreen.Category.route)
             null -> Unit
         }
     }
@@ -79,7 +75,7 @@ fun Content(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White),
+            .background(CustomTheme.colors.white),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Column(

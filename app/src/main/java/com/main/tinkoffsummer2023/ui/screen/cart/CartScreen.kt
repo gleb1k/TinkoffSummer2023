@@ -4,9 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,15 +12,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,32 +36,74 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.main.tinkoffsummer2023.R
+import com.main.tinkoffsummer2023.ui.model.CartProduct
 import com.main.tinkoffsummer2023.ui.model.MockTempConstants
 import com.main.tinkoffsummer2023.ui.model.Product
-import com.main.tinkoffsummer2023.ui.screen.BaseCounter
-import com.main.tinkoffsummer2023.ui.screen.BaseGreenButton
-import com.main.tinkoffsummer2023.ui.screen.BaseTopAppBar
+import com.main.tinkoffsummer2023.ui.navigation.BottomScreen
+import com.main.tinkoffsummer2023.ui.navigation.Screen
+import com.main.tinkoffsummer2023.ui.screen.catalog.CatalogEvent
+import com.main.tinkoffsummer2023.ui.screen.util.BaseCounter
+import com.main.tinkoffsummer2023.ui.screen.util.BaseGreenButton
+import com.main.tinkoffsummer2023.ui.screen.util.BaseTopAppBar
 import com.main.tinkoffsummer2023.ui.theme.custom.CustomTheme
 import com.main.tinkoffsummer2023.ui.theme.custom.baseLightPalette
 
 @Composable
-fun CartScreen() {
-    //EmptyCartScreen()
-    NotEmptyCartScreen()
+private fun CartScreenActions(
+    navController: NavController,
+    viewAction: CartAction?,
+) {
+    LaunchedEffect(viewAction) {
+        when (viewAction) {
+            null -> Unit
+            is CartAction.NavigateToProduct -> navController.navigate(Screen.Product.route)
+            CartAction.NavigateBack -> navController.navigateUp()
+            CartAction.NavigateToCatalog -> navController.navigate(BottomScreen.Category.route)
+        }
+    }
+}
+
+@Composable
+fun CartScreen(
+    navController: NavController,
+    viewModel: CartViewModel = hiltViewModel(),
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val action by viewModel.action.collectAsStateWithLifecycle(null)
+
+    CartScreenActions(
+        navController,
+        action
+    )
+
+    LaunchedEffect(state.cartProducts) {
+        viewModel.event(CartEvent.OnLoad)
+    }
+
+    if (state.cartProducts.isEmpty())
+        EmptyCartScreen(state, viewModel::event)
+    else
+        NotEmptyCartScreen(state, viewModel::event)
+
 }
 
 @Composable
 fun NotEmptyCartScreen(
-
+    state: CartViewState,
+    eventHandler: (CartEvent) -> Unit,
 ) {
     Surface(color = CustomTheme.colors.primaryBackground) {
         Column(modifier = Modifier.fillMaxSize()) {
             BaseTopAppBar(
                 {
                     IconButton(onClick = {
+                        eventHandler.invoke(CartEvent.OnBackClick)
                     }) {
                         Icon(Icons.Filled.ArrowBack, "backIcon")
                     }
@@ -73,32 +116,46 @@ fun NotEmptyCartScreen(
                 },
                 {
                     IconButton(onClick = {
+                        eventHandler.invoke(CartEvent.OnDeleteAllClick)
                     }) {
                         Icon(
                             painterResource(id = R.drawable.trash),
                             "backIcon",
-                            tint = CustomTheme.colors.tertiaryColor,
+                            tint = CustomTheme.colors.purple,
                             modifier = Modifier.size(30.dp)
                         )
                     }
                 }
             )
             LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(1.dp),
+                verticalArrangement = Arrangement.spacedBy(0.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxWidth(),
-                contentPadding = PaddingValues(vertical = 6.dp)
             ) {
                 item {
-                    Text(
-                        text = "Товары(99)",
-                        style = CustomTheme.typography.heading,
-                        modifier = Modifier.align(Alignment.Start)
-                    )
+                    Column(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = CustomTheme.padding.horizontal),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Text(
+                            text = "Товары (${state.cartProducts.size})",
+                            style = CustomTheme.typography.heading,
+                        )
+                    }
                 }
-                items(MockTempConstants.products) {
-                    CartItem(it)
+                itemsIndexed(state.cartProducts) { index, product ->
+
+                    CartItem(product)
+
+                    if (index < state.cartProducts.size)
+                        Divider(
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = CustomTheme.padding.horizontal)
+                        )
                 }
             }
         }
@@ -106,19 +163,24 @@ fun NotEmptyCartScreen(
 
 }
 
+
 @Composable
-fun CartItem(
-    product: Product
+private fun CartItem(
+    cartProduct: CartProduct,
 ) {
     Row(
-        horizontalArrangement = Arrangement.Start,
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 12.dp, horizontal = 24.dp)
+            .fillMaxSize()
+            .padding(
+                vertical = CustomTheme.padding.horizontal,
+                horizontal = CustomTheme.padding.horizontal
+            ),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically
     ) {
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
-                .data(product.imageUrl)
+                .data(cartProduct.product.images[0])
                 .crossfade(true)
                 .build(),
             placeholder = painterResource(R.drawable.ic_launcher_foreground),
@@ -130,49 +192,52 @@ fun CartItem(
                     RoundedCornerShape(2.dp)
                 )
                 .size(128.dp),
-
-            )
+        )
         Column(
-            verticalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight()
+                .height(128.dp)
                 .padding(start = 8.dp),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = product.name,
+                text = cartProduct.product.name,
                 style = CustomTheme.typography.base,
             )
             BaseGreenButton(
                 modifier = Modifier
                     .height(36.dp)
                     .width(150.dp),
-                text = "${product.price} бонуса",
+                text = "${cartProduct.product.price} бонуса",
                 textStyle = TextStyle(
                     fontFamily = FontFamily(Font(R.font.montserrat_bold)),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Normal,
                     color = baseLightPalette.secondaryText
-                )
-            ) {
-
-            }
+                ),
+                onClick = {}
+            )
             Box(modifier = Modifier.align(Alignment.End)) {
-                BaseCounter(count = 99)
+                BaseCounter(count = cartProduct.count)
             }
 
         }
     }
+
 }
 
 
 @Composable
-fun EmptyCartScreen() {
+fun EmptyCartScreen(
+    state: CartViewState,
+    eventHandler: (CartEvent) -> Unit,
+) {
     Surface(color = CustomTheme.colors.primaryBackground) {
         Column(modifier = Modifier.fillMaxSize()) {
             BaseTopAppBar(
                 {
                     IconButton(onClick = {
+                        eventHandler.invoke(CartEvent.OnBackClick)
                     }) {
                         Icon(Icons.Filled.ArrowBack, "backIcon")
                     }
@@ -208,8 +273,9 @@ fun EmptyCartScreen() {
                         .padding(horizontal = 46.dp, vertical = 8.dp)
                         .height(52.dp),
                     text = "Перейти в каталог"
-                ) { }
-
+                ) {
+                    eventHandler.invoke(CartEvent.OnCatalogClick)
+                }
             }
         }
     }

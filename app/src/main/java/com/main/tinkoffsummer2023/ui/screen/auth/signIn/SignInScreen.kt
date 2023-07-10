@@ -25,7 +25,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -33,9 +32,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.main.tinkoffsummer2023.R
 import com.main.tinkoffsummer2023.ui.navigation.BottomScreen
-import com.main.tinkoffsummer2023.ui.screen.BaseTextFieldUi
-import com.main.tinkoffsummer2023.ui.screen.BaseTopAppBar
-import com.main.tinkoffsummer2023.ui.screen.GreenNextButton
+import com.main.tinkoffsummer2023.ui.screen.util.BaseTextFieldUi
+import com.main.tinkoffsummer2023.ui.screen.util.BaseTopAppBar
+import com.main.tinkoffsummer2023.ui.screen.util.CircleGreenButton
 import com.main.tinkoffsummer2023.ui.theme.custom.CustomTheme
 import com.main.tinkoffsummer2023.ui.theme.custom.baseLightPalette
 
@@ -43,11 +42,11 @@ import com.main.tinkoffsummer2023.ui.theme.custom.baseLightPalette
 @Composable
 private fun SignInScreenActions(
     navController: NavController,
-    viewAction: SignInAction?
+    viewAction: SignInAction?,
 ) {
     LaunchedEffect(viewAction) {
         when (viewAction) {
-            SignInAction.NavigateToCatalog -> navController.navigate(BottomScreen.Catalog.route)
+            SignInAction.NavigateToCatalog -> navController.navigate(BottomScreen.Category.route)
             null -> Unit
         }
     }
@@ -57,7 +56,7 @@ private fun SignInScreenActions(
 @Composable
 fun SignInScreen(
     navController: NavController,
-    viewModel: SignInViewModel = hiltViewModel()
+    viewModel: SignInViewModel = hiltViewModel(),
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -75,9 +74,9 @@ fun SignInScreen(
 }
 
 @Composable
-fun Content(
+private fun Content(
     state: SignInViewState,
-    eventHandler: (SignInEvent) -> Unit
+    eventHandler: (SignInEvent) -> Unit,
 ) {
     Surface(color = CustomTheme.colors.primaryBackground) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -100,7 +99,7 @@ fun Content(
                         .fillMaxWidth()
                         .padding(top = 48.dp),
                 ) {
-                    androidx.compose.material.Text(
+                    Text(
                         text = "Вход в профиль",
                         style = CustomTheme.typography.heading
                     )
@@ -112,7 +111,7 @@ fun Content(
                 ) {
                     BaseTextFieldUi(
                         label = "Номер телефона или Email",
-                        value = "",
+                        value = state.queryLogin,
                         //todo спросить у илюхи
                         // onValueChange = eventHandler.invoke(SignUpEvent.OnQueryLoginChange),
                         leadingIcon = {
@@ -121,8 +120,10 @@ fun Content(
                                 "",
                                 Modifier.size(30.dp)
                             )
-                        },
-                    )
+                        }
+                    ) {
+                        eventHandler.invoke(SignInEvent.OnQueryLoginChange(it))
+                    }
                 }
                 // password
                 Column(
@@ -132,6 +133,7 @@ fun Content(
                 ) {
                     BaseTextFieldUi(
                         label = "Пароль",
+                        value = state.queryPassword,
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(R.drawable.lock),
@@ -146,7 +148,7 @@ fun Content(
                                 Modifier.size(24.dp)
                             )
                         }
-                    )
+                    ) { eventHandler.invoke(SignInEvent.OnQueryPasswordChange(it)) }
                 }
                 Column(
                     modifier = Modifier
@@ -180,7 +182,7 @@ fun Content(
                             color = baseLightPalette.primaryText,
                             modifier = Modifier.weight(2f)
                         )
-                        GreenNextButton() {
+                        CircleGreenButton {
                             eventHandler.invoke(SignInEvent.OnSignInClick)
                         }
                     }
@@ -188,14 +190,4 @@ fun Content(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun ScreenPreview() {
-
-//    Content(SignUpViewState(),
-//        Unit
-//    )
-
 }

@@ -30,8 +30,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.main.tinkoffsummer2023.R
-import com.main.tinkoffsummer2023.ui.screen.BaseTextFieldUi
-import com.main.tinkoffsummer2023.ui.screen.GreenNextButton
+import com.main.tinkoffsummer2023.ui.navigation.Screen
+import com.main.tinkoffsummer2023.ui.screen.util.BaseTextFieldUi
+import com.main.tinkoffsummer2023.ui.screen.util.CircleGreenButton
 import com.main.tinkoffsummer2023.ui.theme.custom.CustomTheme
 import com.main.tinkoffsummer2023.ui.theme.custom.baseLightPalette
 
@@ -43,7 +44,7 @@ private fun SignUpScreenActions(
 ) {
     LaunchedEffect(viewAction) {
         when (viewAction) {
-            SignUpAction.NavigateToSignIn -> TODO()
+            SignUpAction.NavigateToSignIn -> navController.navigate(Screen.SignIn.route)
             null -> Unit
         }
     }
@@ -71,7 +72,7 @@ fun SignUpScreen(
 }
 
 @Composable
-fun Content(
+private fun Content(
     state: SignUpViewState,
     eventHandler: (SignUpEvent) -> Unit
 ) {
@@ -111,9 +112,7 @@ fun Content(
                 ) {
                     BaseTextFieldUi(
                         label = "Номер телефона или Email",
-                        value = "",
-                        //todo спросить у илюхи
-//                    onValueChange = eventHandler.invoke(SignUpEvent.OnQueryLoginChange),
+                        value = state.queryLogin,
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(R.drawable.user_filled),
@@ -121,7 +120,7 @@ fun Content(
                                 Modifier.size(30.dp)
                             )
                         },
-                    )
+                    ) { eventHandler.invoke(SignUpEvent.OnQueryLoginChange(it))}
                 }
                 // password
                 Column(
@@ -131,6 +130,7 @@ fun Content(
                 ) {
                     BaseTextFieldUi(
                         label = "Пароль",
+                        value = state.queryPassword,
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(R.drawable.lock),
@@ -145,7 +145,7 @@ fun Content(
                                 Modifier.size(24.dp)
                             )
                         }
-                    )
+                    ) { eventHandler.invoke(SignUpEvent.OnQueryPasswordChange(it))}
                 }
                 // password2
                 Column(
@@ -155,6 +155,7 @@ fun Content(
                 ) {
                     BaseTextFieldUi(
                         label = "Подтверждение пароля",
+                        value = state.queryPasswordConfirm,
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(R.drawable.lock),
@@ -169,7 +170,7 @@ fun Content(
                                 Modifier.size(24.dp)
                             )
                         }
-                    )
+                    ){ eventHandler.invoke(SignUpEvent.OnQueryPasswordConfirmChange(it))}
                 }
                 Column(
                     modifier = Modifier
@@ -187,7 +188,9 @@ fun Content(
                             color = baseLightPalette.primaryText,
                             modifier = Modifier.weight(2f)
                         )
-                        GreenNextButton() {}
+                        CircleGreenButton {
+                            eventHandler.invoke(SignUpEvent.OnSignUpClick)
+                        }
                     }
                 }
             }

@@ -1,10 +1,9 @@
-package com.main.tinkoffsummer2023.ui.screen
+package com.main.tinkoffsummer2023.ui.screen.util
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -25,11 +24,10 @@ import com.main.tinkoffsummer2023.ui.theme.custom.CustomTheme
 @Composable
 fun BuyGreenButton(
     price: Int = 99,
-    onClick: (Int) -> Unit,
-    onclickparam: Int
+    onClick: () -> Unit,
 ) {
     Button(
-        onClick = { onClick.invoke(onclickparam) },
+        onClick = { onClick.invoke() },
         modifier = Modifier
             .fillMaxWidth()
             .height(34.dp),

@@ -63,7 +63,13 @@ class SignUpViewModel @Inject constructor(
             is SignUpEvent.OnQueryLoginChange -> onQueryLoginChange(signUpEvent)
             is SignUpEvent.OnQueryPasswordChange -> onQueryPasswordChange(signUpEvent)
             is SignUpEvent.OnQueryPasswordConfirmChange -> onQueryPasswordConfirmChange(signUpEvent)
-            SignUpEvent.OnSignUpClick -> {}
+            SignUpEvent.OnSignUpClick -> onSignUpClick()
+        }
+    }
+
+    private fun onSignUpClick() {
+        viewModelScope.launch {
+            _action.emit(SignUpAction.NavigateToSignIn)
         }
     }
 

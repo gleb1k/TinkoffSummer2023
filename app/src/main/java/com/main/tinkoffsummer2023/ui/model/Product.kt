@@ -7,5 +7,5 @@ data class Product(
     val rating: Double,
     val description: String,
 
-    val imageUrl: String,
+    val images: List<String>,
 )

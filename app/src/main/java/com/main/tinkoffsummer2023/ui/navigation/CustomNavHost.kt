@@ -21,12 +21,19 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.animeproject.ui.screen.settings.SettingsScreen
 import com.main.tinkoffsummer2023.ui.screen.auth.signIn.SignInScreen
 import com.main.tinkoffsummer2023.ui.screen.auth.signUp.SignUpScreen
 import com.main.tinkoffsummer2023.ui.screen.cart.CartScreen
 import com.main.tinkoffsummer2023.ui.screen.catalog.CatalogScreen
+import com.main.tinkoffsummer2023.ui.screen.catalog.category.CategoryScreen
+import com.main.tinkoffsummer2023.ui.screen.catalog.filter.FilterScreen
+import com.main.tinkoffsummer2023.ui.screen.orders.NotEmptyOrdersScreen
 import com.main.tinkoffsummer2023.ui.screen.orders.OrdersScreen
+import com.main.tinkoffsummer2023.ui.screen.product.ProductScreen
 import com.main.tinkoffsummer2023.ui.screen.profile.ProfileScreen
+import com.main.tinkoffsummer2023.ui.screen.profile.about_app.AboutAppScreen
+import com.main.tinkoffsummer2023.ui.screen.profile.balance.BalanceScreen
 import com.main.tinkoffsummer2023.ui.screen.start.StartScreen
 import com.main.tinkoffsummer2023.ui.theme.custom.CustomTheme
 
@@ -39,7 +46,7 @@ fun CustomNavHost(
 ) {
     val bottomScreens = listOf(
         BottomScreen.Orders,
-        BottomScreen.Catalog,
+        BottomScreen.Category,
         BottomScreen.Cart,
         BottomScreen.Profile
     )
@@ -91,11 +98,18 @@ fun CustomNavHost(
             startDestination = startDestination.route,
             Modifier.padding(innerPadding),
         ) {
-            composable(BottomScreen.Cart.route) { CartScreen() }
-            composable(BottomScreen.Catalog.route) { CatalogScreen(navController) }
-            composable(BottomScreen.Orders.route) { OrdersScreen() }
-            composable(BottomScreen.Profile.route) { ProfileScreen() }
+            composable(BottomScreen.Cart.route) { CartScreen(navController) }
+            composable(BottomScreen.Orders.route) { OrdersScreen(navController) }
 
+            composable(BottomScreen.Category.route) { CategoryScreen(navController) }
+            composable(Screen.Catalog.route) { CatalogScreen(navController) }
+            composable(Screen.Filter.route) { FilterScreen(navController) }
+            composable(Screen.Product.route) { ProductScreen(navController) }
+
+            composable(BottomScreen.Profile.route) { ProfileScreen(navController) }
+            composable(Screen.Settings.route) { SettingsScreen(navController) }
+            composable(Screen.AboutApp.route) { AboutAppScreen(navController) }
+            composable(Screen.Balance.route) { BalanceScreen(navController) }
 
             composable(Screen.Start.route) { StartScreen(navController) }
             composable(Screen.SignIn.route) { SignInScreen(navController) }

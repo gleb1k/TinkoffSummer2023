@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 
 
 data class Colors(
@@ -17,7 +18,11 @@ data class Colors(
     val white: Color,
 
     val errorColor: Color,
-    val tertiaryColor : Color
+
+    val purple: Color,
+    val red: Color,
+    val blue: Color,
+    val gray: Color,
 )
 
 data class Typography(
@@ -25,6 +30,11 @@ data class Typography(
     val hint: TextStyle,
     val base: TextStyle,
     val bottom: TextStyle,
+)
+
+data class Padding (
+    val vertical: Dp,
+    val horizontal : Dp,
 )
 
 object CustomTheme {
@@ -37,6 +47,9 @@ object CustomTheme {
         @Composable
         get() = LocalCustomTypography.current
 
+    val padding : Padding
+        @Composable
+        get() = LocalCustomPadding.current
 }
 
 val LocalCustomColors = staticCompositionLocalOf<Colors> {
@@ -44,6 +57,10 @@ val LocalCustomColors = staticCompositionLocalOf<Colors> {
 }
 
 val LocalCustomTypography = staticCompositionLocalOf<Typography> {
+    error("No font provided")
+}
+
+val LocalCustomPadding = staticCompositionLocalOf<Padding> {
     error("No font provided")
 }
 

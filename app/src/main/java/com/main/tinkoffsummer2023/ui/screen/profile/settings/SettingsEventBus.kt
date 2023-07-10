@@ -1,4 +1,4 @@
-package com.main.tinkoffsummer2023.ui.screen.settings
+package com.main.tinkoffsummer2023.ui.screen.profile.settings
 
 import androidx.compose.runtime.staticCompositionLocalOf
 import kotlinx.coroutines.flow.MutableStateFlow

@@ -32,13 +32,19 @@ sealed interface ProfileEvent : ViewEvent {
     object OnThemeClick : ProfileEvent
     object OnAboutAppClick : ProfileEvent
 
+    object OnBalanceClick : ProfileEvent
+
+    object OnBackClick : ProfileEvent
     data class OnLoading(val isLoading: Boolean) : ProfileEvent
     data class OnError(val errorMessage: String?) : ProfileEvent
 }
 
 sealed interface ProfileAction {
     object NavigateToAboutApp : ProfileAction
-    object NavigateTheme: ProfileAction
+    object NavigateTheme : ProfileAction
+    object NavigateToBalance : ProfileAction
+
+    object NavigateBack : ProfileAction
 }
 
 
@@ -54,12 +60,26 @@ class ProfileViewModel @Inject constructor(
     val action: SharedFlow<ProfileAction?>
         get() = _action.asSharedFlow()
 
-    fun event(catalogEvent: ProfileEvent) {
-        when (catalogEvent) {
-            is ProfileEvent.OnError -> onError(catalogEvent)
-            is ProfileEvent.OnLoading -> onLoading(catalogEvent)
-            ProfileEvent.OnAboutAppClick -> TODO()
-            ProfileEvent.OnThemeClick -> TODO()
+    fun event(event: ProfileEvent) {
+        when (event) {
+            is ProfileEvent.OnError -> onError(event)
+            is ProfileEvent.OnLoading -> onLoading(event)
+            is ProfileEvent.OnAboutAppClick -> onAboutAppClick(event)
+            is ProfileEvent.OnThemeClick -> onThemeClick(event)
+            is ProfileEvent.OnBackClick -> onBackClick()
+            is ProfileEvent.OnBalanceClick -> onBalanceClick(event)
+        }
+    }
+
+    private fun onBackClick() {
+        viewModelScope.launch {
+            _action.emit(ProfileAction.NavigateBack)
+        }
+    }
+
+    private fun onBalanceClick(event: ProfileEvent.OnBalanceClick) {
+        viewModelScope.launch {
+            _action.emit(ProfileAction.NavigateToBalance)
         }
     }
 

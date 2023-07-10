@@ -1,4 +1,4 @@
-package com.main.tinkoffsummer2023.ui.screen
+package com.main.tinkoffsummer2023.ui.screen.util
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -21,17 +21,17 @@ import com.main.tinkoffsummer2023.ui.theme.custom.CustomTheme
 fun BaseTextFieldUi(
     value: String = "",
     label: String = "",
-    onValueChange: ((String) -> Unit)? = null,
     leadingIcon: (@Composable () -> Unit)? = null,
-    trailingIcon: (@Composable () -> Unit)? = null
+    trailingIcon: (@Composable () -> Unit)? = null,
+    onValueChange: (String) -> Unit,
 ) {
 
     TextField(
         value = value,
-        onValueChange = { onValueChange?.invoke(it) },
+        onValueChange = { onValueChange.invoke(it) },
         modifier = Modifier
             .fillMaxWidth(),
-        label = {
+        placeholder = {
             Text(
                 text = label,
                 style = CustomTheme.typography.hint
@@ -65,7 +65,7 @@ private fun UiPreview() {
             )
         )
         {
-            BaseTextFieldUi()
+//            BaseTextFieldUi()
         }
     }
 

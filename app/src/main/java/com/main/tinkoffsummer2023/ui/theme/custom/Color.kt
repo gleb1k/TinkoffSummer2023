@@ -13,7 +13,11 @@ internal val baseLightPalette = Colors(
     white = Color(0xFFFFFFFF),
 
     errorColor = Color(0xFFFF0000),
-    tertiaryColor = Color(0xFFCB6CE6)
+
+    purple = Color(0xFFCB6CE6),
+    red = Color(0xFFF95252),
+    blue = Color(0xFF5271FF),
+    gray = Color(0xFF8F8F8F),
 )
 
 
@@ -26,6 +30,10 @@ internal val baseDarkPalette = Colors(
     white = Color(0xCC7A8A99),
 
     errorColor = Color(0xFFFF6699),
-    tertiaryColor = Color(0xFFCB6CE6)
+
+    purple = Color(0xFFCB6CE6),
+    red = Color(0xFFF95252),
+    blue = Color(0xFF5271FF),
+    gray = Color(0xFF8F8F8F),
 )
 

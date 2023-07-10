@@ -60,7 +60,13 @@ class SignInViewModel @Inject constructor(
             is SignInEvent.OnLoading -> onLoading(signUpEvent)
             is SignInEvent.OnQueryLoginChange -> onQueryLoginChange(signUpEvent)
             is SignInEvent.OnQueryPasswordChange -> onQueryPasswordChange(signUpEvent)
-            SignInEvent.OnSignInClick -> {}
+            SignInEvent.OnSignInClick -> onSignInClick()
+        }
+    }
+
+    private fun onSignInClick() {
+        viewModelScope.launch {
+            _action.emit(SignInAction.NavigateToCatalog)
         }
     }
 

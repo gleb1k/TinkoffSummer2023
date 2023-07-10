@@ -1,4 +1,4 @@
-package com.main.tinkoffsummer2023.ui.screen
+package com.main.tinkoffsummer2023.ui.screen.util
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
@@ -29,21 +29,21 @@ fun BaseCounter(
         Icon(
             painterResource(id = R.drawable.minus),
             "minus",
-            tint = CustomTheme.colors.tertiaryColor,
+            tint = CustomTheme.colors.purple,
             modifier = Modifier.size(18.dp),
         )
         Text(
             modifier = Modifier.padding(horizontal = 4.dp),
             text = "$count", style = TextStyle(
                 fontFamily = FontFamily(Font(R.font.montserrat_bold)),
-                fontSize = 18.sp,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = baseLightPalette.tertiaryColor
-            )
+                color = baseLightPalette.purple
+            ),
         )
         Icon(
             painterResource(id = R.drawable.plus),
-            "plus", tint = CustomTheme.colors.tertiaryColor,
+            "plus", tint = CustomTheme.colors.purple,
             modifier = Modifier.size(18.dp),
         )
 

@@ -4,8 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.main.tinkoffsummer2023.ui.ViewEvent
 import com.main.tinkoffsummer2023.ui.ViewState
-import com.main.tinkoffsummer2023.ui.screen.catalog.CatalogEvent
+import com.main.tinkoffsummer2023.ui.model.MockTempConstants
+import com.main.tinkoffsummer2023.ui.model.Order
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -18,8 +21,8 @@ import javax.inject.Inject
 
 @Immutable
 data class OrdersViewState(
-    val query: String = "",
-//    val categories: PersistentList<Category> = MockTempConstants.categories,
+//    val orders: PersistentList<Order> = persistentListOf(),
+    val orders: PersistentList<Order> = MockTempConstants.orders,
 
     override val loading: Boolean = false,
     override val error: String? = null,
@@ -29,12 +32,14 @@ sealed interface OrdersEvent : ViewEvent {
 
     data class OnOrderItemClick(val id: Int) : OrdersEvent
 
+    object OnBackClick : OrdersEvent
     data class OnLoading(val isLoading: Boolean) : OrdersEvent
     data class OnError(val errorMessage: String?) : OrdersEvent
 }
 
 sealed interface OrdersAction {
     data class NavigateToOrder(val categoryId: Int) : OrdersAction
+    object NavigateBack : OrdersAction
 }
 
 @HiltViewModel
@@ -54,22 +59,13 @@ class OrdersViewModel @Inject constructor(
             is OrdersEvent.OnError -> onError(event)
             is OrdersEvent.OnLoading -> onLoading(event)
             is OrdersEvent.OnOrderItemClick -> onCategoryItemClick(event)
+            OrdersEvent.OnBackClick -> TODO()
         }
     }
 
     private fun onCategoryItemClick(event: OrdersEvent.OnOrderItemClick) {
         viewModelScope.launch {
             _action.emit(OrdersAction.NavigateToOrder(event.id))
-        }
-    }
-
-    private fun onQueryChange(event: CatalogEvent.OnQueryChange) {
-        viewModelScope.launch {
-            _state.emit(
-                _state.value.copy(
-                    query = event.query
-                )
-            )
         }
     }
 
