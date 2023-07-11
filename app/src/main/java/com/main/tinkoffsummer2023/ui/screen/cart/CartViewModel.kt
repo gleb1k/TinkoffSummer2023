@@ -19,10 +19,13 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.annotation.concurrent.Immutable
 import javax.inject.Inject
 
+@Immutable
 data class CartViewState(
     val cartProducts: PersistentList<CartProduct> = persistentListOf(),
+
 
     override val loading: Boolean = false,
     override val error: String? = null,
@@ -45,9 +48,10 @@ sealed interface CartEvent : ViewEvent {
 }
 
 sealed interface CartAction {
-    data class NavigateToProduct(val categoryId: Int) : CartAction
+    data class NavigateToProduct(val productId: Int) : CartAction
     object NavigateBack : CartAction
     object NavigateToCatalog : CartAction
+    object NavigateToOrderAddress : CartAction
 }
 
 @HiltViewModel
@@ -79,14 +83,15 @@ class CartViewModel @Inject constructor(
     }
 
     private fun onCheckoutOrderClick() {
-
+        viewModelScope.launch {
+            _action.emit(CartAction.NavigateToOrderAddress)
+        }
     }
 
     private fun onProductPlusClick(cartEvent: CartEvent.OnProductPlusClick) {
 
     }
 
-    // todo вот тут что делать? по-идее тупо пересоздать лист с новым параметром одного продукта, но это супер тупо...
     private fun onProductMinusClick(cartEvent: CartEvent.OnProductMinusClick) {
 //        viewModelScope.launch {
 //            val newProduct = repository.minusCartProductById(cartEvent.productId)

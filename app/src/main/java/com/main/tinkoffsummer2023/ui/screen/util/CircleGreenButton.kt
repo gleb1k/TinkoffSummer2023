@@ -19,23 +19,42 @@ import com.main.tinkoffsummer2023.ui.theme.custom.CustomTheme
 fun CircleGreenButton(
     @DrawableRes
     icon: Int = R.drawable.arrow_next,
-    onClick: () -> Unit
+    isGreen: Boolean = true,
+    onClick: () -> Unit,
 ) {
-    IconButton(
-        modifier = Modifier
-            .size(56.dp)
-            .clip(CircleShape)
-            .background(CustomTheme.colors.secondaryBackground),
-        onClick = { onClick.invoke() },
+    if (isGreen)
+        IconButton(
+            modifier = Modifier
+                .size(56.dp)
+                .clip(CircleShape)
+                .background(CustomTheme.colors.secondaryBackground),
+            onClick = { onClick.invoke() },
+            enabled = isGreen
 
-        ) {
-        Icon(
-            painterResource(id = icon),
-            contentDescription = "",
-            tint = CustomTheme.colors.secondaryText,
-            modifier = Modifier.size(20.dp)
-        )
-    }
+            ) {
+            Icon(
+                painterResource(id = icon),
+                contentDescription = "",
+                tint = CustomTheme.colors.secondaryText,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+    else
+        IconButton(
+            modifier = Modifier
+                .size(56.dp)
+                .clip(CircleShape)
+                .background(CustomTheme.colors.gray),
+            onClick = { onClick.invoke() },
+            enabled = isGreen
+            ) {
+            Icon(
+                painterResource(id = icon),
+                contentDescription = "",
+                tint = CustomTheme.colors.secondaryText,
+                modifier = Modifier.size(20.dp)
+            )
+        }
 }
 
 

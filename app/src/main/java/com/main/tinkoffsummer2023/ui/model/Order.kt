@@ -3,11 +3,13 @@ package com.main.tinkoffsummer2023.ui.model
 import androidx.compose.ui.graphics.Color
 
 data class Order(
-    val id : Int,
-    val orderTime : String,
-    val finishTime : String,
-    val status : String,
-    val product: Product,
+    val id : Int = -1,
+    val orderTime : String = "",
+    val finishTime : String = "",
+    val address: String = "",
+
+    val status : String = "",
+    val products: List<CartProduct> = listOf(),
 )
 
 //

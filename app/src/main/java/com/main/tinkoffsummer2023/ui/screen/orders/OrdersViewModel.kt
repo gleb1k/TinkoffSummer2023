@@ -2,13 +2,15 @@ package com.main.tinkoffsummer2023.ui.screen.orders
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.main.tinkoffsummer2023.domain.MainRepository
 import com.main.tinkoffsummer2023.ui.ViewEvent
 import com.main.tinkoffsummer2023.ui.ViewState
-import com.main.tinkoffsummer2023.ui.model.MockTempConstants
+import com.main.tinkoffsummer2023.ui.model.MockBackend
 import com.main.tinkoffsummer2023.ui.model.Order
+import com.main.tinkoffsummer2023.ui.screen.profile.balance.BalanceAction
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -21,8 +23,7 @@ import javax.inject.Inject
 
 @Immutable
 data class OrdersViewState(
-//    val orders: PersistentList<Order> = persistentListOf(),
-    val orders: PersistentList<Order> = MockTempConstants.orders,
+    val orders: PersistentList<Order> = MockBackend.ordersDataBase.toPersistentList(),
 
     override val loading: Boolean = false,
     override val error: String? = null,
@@ -44,7 +45,7 @@ sealed interface OrdersAction {
 
 @HiltViewModel
 class OrdersViewModel @Inject constructor(
-    // private val mainRepository: MainRepository
+    private val mainRepository: MainRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow<OrdersViewState>(OrdersViewState())
     val state: StateFlow<OrdersViewState>
@@ -59,7 +60,13 @@ class OrdersViewModel @Inject constructor(
             is OrdersEvent.OnError -> onError(event)
             is OrdersEvent.OnLoading -> onLoading(event)
             is OrdersEvent.OnOrderItemClick -> onCategoryItemClick(event)
-            OrdersEvent.OnBackClick -> TODO()
+            OrdersEvent.OnBackClick -> onBackClick()
+        }
+    }
+
+    private fun onBackClick() {
+        viewModelScope.launch {
+            _action.emit(OrdersAction.NavigateBack)
         }
     }
 

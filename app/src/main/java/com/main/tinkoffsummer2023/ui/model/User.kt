@@ -1,8 +1,11 @@
 package com.main.tinkoffsummer2023.ui.model
 
 data class User(
-    val id: Int,
-    val email: String,
-    val tel: String,
-    val score: Int,
+    val login: String,
+    val password : String,
+    val score: Int = 1000,
+    val isAdmin : Boolean = false,
+    val name: String = "Иван Иванов",
+
+    val token : String,
 )

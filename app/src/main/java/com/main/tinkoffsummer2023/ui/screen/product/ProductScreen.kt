@@ -2,11 +2,14 @@ package com.main.tinkoffsummer2023.ui.screen.product
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
@@ -34,6 +37,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.main.tinkoffsummer2023.R
+import com.main.tinkoffsummer2023.ui.screen.util.BaseGreenButton
 import com.main.tinkoffsummer2023.ui.screen.util.BaseInfoColumn
 import com.main.tinkoffsummer2023.ui.screen.util.BaseTopAppBar
 import com.main.tinkoffsummer2023.ui.theme.custom.CustomTheme
@@ -41,7 +45,7 @@ import com.main.tinkoffsummer2023.ui.theme.custom.CustomTheme
 @Composable
 private fun ProductScreenActions(
     navController: NavController,
-    viewAction: ProductAction?
+    viewAction: ProductAction?,
 ) {
     LaunchedEffect(viewAction) {
         when (viewAction) {
@@ -55,11 +59,20 @@ private fun ProductScreenActions(
 @Composable
 fun ProductScreen(
     navController: NavController,
-    viewModel: ProductViewModel = hiltViewModel()
+    productId: Int?,
+    viewModel: ProductViewModel = hiltViewModel(),
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
     val action by viewModel.action.collectAsStateWithLifecycle(null)
+
+    if (productId != null) {
+        LaunchedEffect(Unit) {
+            viewModel.event(ProductEvent.OnLoad(productId))
+        }
+    } else {
+        viewModel.event(ProductEvent.OnError("There is nothing to load, id==null"))
+    }
 
     Content(
         state,
@@ -76,7 +89,7 @@ fun ProductScreen(
 @Composable
 fun Content(
     state: ProductViewState,
-    eventHandler: (ProductEvent) -> Unit
+    eventHandler: (ProductEvent) -> Unit,
 ) {
     Surface(color = CustomTheme.colors.primaryBackground) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -86,85 +99,115 @@ fun Content(
                     Icon(Icons.Filled.ArrowBack, "backIcon")
                 }
             })
-            val pagerState = rememberPagerState()
 
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.vertical),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                item {
-                    HorizontalPager(
-                        pageCount = state.product.images.size,
-                        state = pagerState,
-                        key = { state.product.images[it] },
+            state.product?.let {
+                val pagerState = rememberPagerState()
+                Box(
+                    Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.BottomCenter,
+                ) {
+                    LazyColumn(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(400.dp)
+                            .fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(CustomTheme.padding.vertical),
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
-                        AsyncImage(
-                            model = ImageRequest.Builder(LocalContext.current)
-                                .data(state.product.images[it])
-                                .crossfade(true)
-                                .build(),
-                            placeholder = painterResource(R.drawable.ic_launcher_foreground),
-                            error = painterResource(R.drawable.main_icon),
-                            contentDescription = "",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier.fillMaxSize()
-                        )
-                    }
-                }
-
-                item {
-                    BaseInfoColumn(
-                        content = {
-                            Text(text = state.product.name, style = CustomTheme.typography.base)
-                            Text(
-                                text = "${state.product.price} бонуса",
-                                style = CustomTheme.typography.heading
-                            )
-                        }
-                    )
-
-                }
-                item {
-                    BaseInfoColumn(
-                        content = {
-                            Text(text = "ООО AAA", style = CustomTheme.typography.base)
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
+                        item {
+                            HorizontalPager(
+                                pageCount = state.product.images.size,
+                                state = pagerState,
+                                key = { state.product.images[it] },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(400.dp)
                             ) {
-                                repeat(5) {
-                                    Icon(
-                                        Icons.Default.Star,
-                                        contentDescription = "",
-                                        Modifier.size(20.dp)
-                                    )
-                                }
-                                Text(
-                                    text = "${state.product.rating}",
-                                    style = CustomTheme.typography.hint
+                                AsyncImage(
+                                    model = ImageRequest.Builder(LocalContext.current)
+                                        .data(state.product.images[it])
+                                        .crossfade(true)
+                                        .build(),
+                                    placeholder = painterResource(R.drawable.ic_launcher_foreground),
+                                    error = painterResource(R.drawable.main_icon),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize()
                                 )
                             }
-                            Divider()
-                            Text(
-                                text = "+7 (987) 654 33 21",
-                                style = CustomTheme.typography.hint
+                        }
+                        item {
+                            BaseInfoColumn(
+                                content = {
+                                    Text(
+                                        text = state.product.name,
+                                        style = CustomTheme.typography.baseBold
+                                    )
+                                    Text(
+                                        text = "${state.product.price} бонуса",
+                                        style = CustomTheme.typography.boldBig,
+                                        color = CustomTheme.colors.secondaryBackground,
+                                    )
+                                }
+                            )
+
+                        }
+                        item {
+                            BaseInfoColumn(
+                                content = {
+                                    Text(text = "ООО \"Иван Иванов\"", style = CustomTheme.typography.baseBold)
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                    ) {
+                                        repeat(state.product.rating.toInt()) {
+                                            Icon(
+                                                Icons.Default.Star,
+                                                contentDescription = "",
+                                                Modifier.size(24.dp)
+                                            )
+                                        }
+                                        Text(
+                                            text = "${state.product.rating}",
+                                            style = CustomTheme.typography.baseBold,
+                                            modifier = Modifier.padding(horizontal = 8.dp)
+                                        )
+                                    }
+                                    Divider(Modifier.padding(top = 4.dp, bottom = 8.dp))
+                                    Text(
+                                        text = "+7 (800) 555 35 35",
+                                        style = CustomTheme.typography.hint
+                                    )
+                                }
                             )
                         }
-                    )
-                }
-                item {
-                    BaseInfoColumn(
-                        content = {
-                            Text(
-                                text = state.product.description,
-                                style = CustomTheme.typography.base
+                        item {
+                            BaseInfoColumn(
+                                content = {
+                                    Text(
+                                        text = state.product.description,
+                                        style = CustomTheme.typography.base
+                                    )
+                                }
                             )
                         }
-                    )
+                        item {
+                            Spacer(modifier = Modifier.height(56.dp))
+                        }
+                    }
+                    Box(
+                        modifier = Modifier.padding(
+                            horizontal = CustomTheme.padding.horizontal,
+                            vertical = CustomTheme.padding.horizontal
+                        ),
+                    ) {
+                        BaseGreenButton(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(50.dp),
+                            text = "Добавить в корзину",
+                            textStyle = CustomTheme.typography.baseWhite,
+                        ) {
+                            eventHandler.invoke(ProductEvent.OnAddToCartClick)
+                        }
+                    }
                 }
             }
         }

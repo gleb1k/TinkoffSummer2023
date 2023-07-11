@@ -1,10 +1,11 @@
 package com.main.tinkoffsummer2023.ui.screen.catalog
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,11 +16,13 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.LocalContentColor
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
@@ -33,6 +36,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -41,9 +47,9 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.main.tinkoffsummer2023.R
-import com.main.tinkoffsummer2023.ui.model.MockTempConstants
 import com.main.tinkoffsummer2023.ui.model.Product
 import com.main.tinkoffsummer2023.ui.navigation.Screen
+import com.main.tinkoffsummer2023.ui.screen.util.BaseGreenButton
 import com.main.tinkoffsummer2023.ui.screen.util.BuyGreenButton
 import com.main.tinkoffsummer2023.ui.screen.util.CustomTextField
 import com.main.tinkoffsummer2023.ui.theme.custom.CustomTheme
@@ -58,7 +64,8 @@ private fun CatalogScreenActions(
         when (viewAction) {
             null -> Unit
             CatalogAction.NavigateToFilter -> navController.navigate(Screen.Filter.route)
-            is CatalogAction.NavigateToProduct -> navController.navigate(Screen.Product.route)
+            // todo kostyl
+            is CatalogAction.NavigateToProduct -> navController.navigate("product/${viewAction.productId}")
             CatalogAction.NavigateBack -> navController.navigateUp()
         }
     }
@@ -68,14 +75,20 @@ private fun CatalogScreenActions(
 @Composable
 fun CatalogScreen(
     navController: NavController,
+    query: String? = null,
     viewModel: CatalogViewModel = hiltViewModel(),
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
     val action by viewModel.action.collectAsStateWithLifecycle(null)
 
-    LaunchedEffect(state.products) {
-        viewModel.event(CatalogEvent.OnLoad)
+    // kostyl' криво работает... я устал
+    LaunchedEffect(query) {
+        if (query != null) {
+            viewModel.event(CatalogEvent.OnQueryChange(query))
+            viewModel.event(CatalogEvent.OnSearchClick(state.query))
+        } else
+            viewModel.event(CatalogEvent.OnSearchClick(state.query))
     }
 
     Content(
@@ -96,32 +109,58 @@ private fun Content(
 ) {
     Surface(color = CustomTheme.colors.primaryBackground) {
         Column(modifier = Modifier.fillMaxSize()) {
-
             TopAppBar(
                 backgroundColor = CustomTheme.colors.secondaryBackground,
                 elevation = 8.dp,
             ) {
-                CustomTextField(
-                    leadingIcon = {
-                        Icon(
-                            painterResource(id = R.drawable.search_green),
-                            null,
-                            tint = CustomTheme.colors.secondaryBackground
-                        )
-                    },
-                    trailingIcon = null,
-                    modifier = Modifier
-                        .background(
-                            MaterialTheme.colors.surface,
-                            RoundedCornerShape(percent = 40)
-                        )
-                        .padding(4.dp)
-                        .height(30.dp),
-                    fontSize = 16.sp,
-                    placeholderText = "Искать на СкороХод"
-                )
+                IconButton(onClick = {
+                    eventHandler.invoke(CatalogEvent.OnBackClick)
+                }) {
+                    Icon(Icons.Filled.ArrowBack, "backIcon")
+                }
+                Box(
+                    Modifier
+                        .weight(1.0f)
+                ) {
+                    CustomTextField(
+                        trailingIcon = null,
+                        modifier = Modifier
+                            .background(
+                                MaterialTheme.colors.surface,
+                                RoundedCornerShape(percent = 40)
+                            )
+                            .padding(4.dp)
+                            .height(30.dp),
+                        fontSize = 16.sp,
+                        placeholderText = "Искать на СкороХод",
+                        value = state.query,
+                        onValueChange = { eventHandler.invoke(CatalogEvent.OnQueryChange(it)) },
+                        keyboardOptions = KeyboardOptions().copy(
+                            capitalization = KeyboardCapitalization.None,
+                            autoCorrect = false,
+                            keyboardType = KeyboardType.Text,
+                            imeAction = ImeAction.Search
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onSearch = {
+                                eventHandler.invoke(CatalogEvent.OnSearchClick(state.query))
+                            }
+                        ),
+                    )
+                }
+                //какая-то херня происходит с размерами
+                IconButton(onClick = {
+                    eventHandler.invoke(CatalogEvent.OnFilterClick)
+                }) {
+                    Icon(
+                        painterResource(id = R.drawable.filter),
+                        null,
+                        modifier = Modifier
+                            .size(46.dp)
+                            .padding(horizontal = 12.dp)
+                    )
+                }
             }
-
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -129,27 +168,31 @@ private fun Content(
                     .fillMaxWidth()
                     .padding(horizontal = 12.dp),
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 0.dp),
-                ) {
-
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        contentPadding = PaddingValues(),
-                        verticalArrangement = Arrangement.spacedBy(12.dp),
-                        horizontalArrangement = Arrangement.spacedBy(20.dp),
+                if (state.products.isEmpty())
+                    EmptyCatalogScreen(eventHandler)
+                else {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(top = 0.dp),
                     ) {
-                        items(MockTempConstants.products) {
-                            ProductItem(
-                                it,
-                                { eventHandler.invoke(CatalogEvent.OnProductItemClick(it.id)) },
-                                { eventHandler.invoke(CatalogEvent.OnAddToCartClick(it.id)) }
-                            )
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            horizontalArrangement = Arrangement.spacedBy(20.dp),
+                        ) {
+
+                            items(state.products, key = { it.id }) {
+                                ProductItem(
+                                    it,
+                                    { eventHandler.invoke(CatalogEvent.OnProductItemClick(it.id)) },
+                                    { eventHandler.invoke(CatalogEvent.OnAddToCartClick(it.id)) }
+                                )
+                            }
                         }
                     }
                 }
+
             }
         }
     }
@@ -177,6 +220,7 @@ private fun ProductItem(
                 .clickable {
                     onImageClick.invoke()
                 }
+                .fillMaxWidth()
         )
         Text(
             text = product.name,
@@ -188,10 +232,10 @@ private fun ProductItem(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row {
-                repeat(5) {
+                repeat(product.rating.toInt()) {
                     Icon(
                         Icons.Default.Star,
-                        contentDescription = "",
+                        contentDescription = null,
                         Modifier.size(20.dp)
                     )
                 }
@@ -204,4 +248,43 @@ private fun ProductItem(
         BuyGreenButton(product.price) { onButtonClick.invoke() }
     }
 }
+
+@Composable
+fun EmptyCatalogScreen(
+    eventHandler: (CatalogEvent) -> Unit,
+) {
+    Surface(color = CustomTheme.colors.secondaryText) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 56.dp),
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.box2),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .size(180.dp)
+                        .padding()
+                )
+                Text(
+                    text = "Простите, по Вашему запросу товаров сейчас нет",
+                    style = CustomTheme.typography.base,
+                )
+                BaseGreenButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 46.dp, vertical = 8.dp)
+                        .height(52.dp),
+                    text = "Перейти в каталог"
+                ) {
+                    eventHandler.invoke(CatalogEvent.OnBackClick)
+                }
+            }
+        }
+    }
+}
+
 

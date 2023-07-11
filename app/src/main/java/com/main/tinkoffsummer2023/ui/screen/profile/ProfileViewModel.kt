@@ -2,12 +2,12 @@ package com.main.tinkoffsummer2023.ui.screen.profile
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.main.tinkoffsummer2023.core.PreferenceManager
+import com.main.tinkoffsummer2023.domain.MainRepository
 import com.main.tinkoffsummer2023.ui.ViewEvent
 import com.main.tinkoffsummer2023.ui.ViewState
-import com.main.tinkoffsummer2023.ui.model.Category
-import com.main.tinkoffsummer2023.ui.model.MockTempConstants
+import com.main.tinkoffsummer2023.ui.model.User
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.collections.immutable.PersistentList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -21,7 +21,7 @@ import javax.inject.Inject
 
 @Immutable
 data class ProfileViewState(
-    val categories: PersistentList<Category> = MockTempConstants.categories,
+    val user: User? = null,
 
     override val loading: Boolean = false,
     override val error: String? = null,
@@ -34,7 +34,10 @@ sealed interface ProfileEvent : ViewEvent {
 
     object OnBalanceClick : ProfileEvent
 
+    object OnLoad: ProfileEvent
+
     object OnBackClick : ProfileEvent
+    object OnAuthorize: ProfileEvent
     data class OnLoading(val isLoading: Boolean) : ProfileEvent
     data class OnError(val errorMessage: String?) : ProfileEvent
 }
@@ -44,12 +47,15 @@ sealed interface ProfileAction {
     object NavigateTheme : ProfileAction
     object NavigateToBalance : ProfileAction
 
+    object NavigateToLogin: ProfileAction
     object NavigateBack : ProfileAction
 }
 
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
+    private val repository: MainRepository,
+    private val preferenceManager: PreferenceManager,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<ProfileViewState>(ProfileViewState())
@@ -64,10 +70,35 @@ class ProfileViewModel @Inject constructor(
         when (event) {
             is ProfileEvent.OnError -> onError(event)
             is ProfileEvent.OnLoading -> onLoading(event)
-            is ProfileEvent.OnAboutAppClick -> onAboutAppClick(event)
-            is ProfileEvent.OnThemeClick -> onThemeClick(event)
+            is ProfileEvent.OnAboutAppClick -> onAboutAppClick()
+            is ProfileEvent.OnThemeClick -> onThemeClick()
             is ProfileEvent.OnBackClick -> onBackClick()
             is ProfileEvent.OnBalanceClick -> onBalanceClick(event)
+            ProfileEvent.OnAuthorize -> onAuthorize()
+            ProfileEvent.OnLoad -> onLoad()
+        }
+    }
+
+    private fun onLoad() {
+        viewModelScope.launch {
+            try {
+                onLoading(ProfileEvent.OnLoading(true))
+                _state.emit(
+                    _state.value.copy(
+                        user = repository.getUserInfo(preferenceManager.getUserToken())
+                    )
+                )
+            } catch (throwable: Throwable) {
+                onError(ProfileEvent.OnError("Нет соединения"))
+            } finally {
+                onLoading(ProfileEvent.OnLoading(false))
+            }
+        }
+    }
+
+    private fun onAuthorize() {
+        viewModelScope.launch {
+            _action.emit(ProfileAction.NavigateToLogin)
         }
     }
 
@@ -83,13 +114,13 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    private fun onAboutAppClick(event: ProfileEvent.OnAboutAppClick) {
+    private fun onAboutAppClick() {
         viewModelScope.launch {
             _action.emit(ProfileAction.NavigateToAboutApp)
         }
     }
 
-    private fun onThemeClick(event: ProfileEvent.OnThemeClick) {
+    private fun onThemeClick() {
         viewModelScope.launch {
             _action.emit(ProfileAction.NavigateTheme)
         }

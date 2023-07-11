@@ -11,3 +11,5 @@ fun <T> PersistentList<T>.replaceByField(fieldSelector: (T) -> Any, replacement:
         this
     }
 }
+
+fun <E> Iterable<E>.replace(old: E, new: E) = map { if (it == old) new else it }

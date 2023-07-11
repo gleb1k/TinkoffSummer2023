@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.Checkbox
+import androidx.compose.material.CheckboxColors
+import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -23,7 +26,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -33,6 +35,7 @@ import com.main.tinkoffsummer2023.R
 import com.main.tinkoffsummer2023.ui.navigation.Screen
 import com.main.tinkoffsummer2023.ui.screen.util.BaseTextFieldUi
 import com.main.tinkoffsummer2023.ui.screen.util.CircleGreenButton
+import com.main.tinkoffsummer2023.ui.screen.util.PasswordTextField
 import com.main.tinkoffsummer2023.ui.theme.custom.CustomTheme
 import com.main.tinkoffsummer2023.ui.theme.custom.baseLightPalette
 
@@ -40,7 +43,7 @@ import com.main.tinkoffsummer2023.ui.theme.custom.baseLightPalette
 @Composable
 private fun SignUpScreenActions(
     navController: NavController,
-    viewAction: SignUpAction?
+    viewAction: SignUpAction?,
 ) {
     LaunchedEffect(viewAction) {
         when (viewAction) {
@@ -54,7 +57,7 @@ private fun SignUpScreenActions(
 @Composable
 fun SignUpScreen(
     navController: NavController,
-    viewModel: SignUpViewModel = hiltViewModel()
+    viewModel: SignUpViewModel = hiltViewModel(),
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -74,7 +77,7 @@ fun SignUpScreen(
 @Composable
 private fun Content(
     state: SignUpViewState,
-    eventHandler: (SignUpEvent) -> Unit
+    eventHandler: (SignUpEvent) -> Unit,
 ) {
     Surface(color = CustomTheme.colors.primaryBackground) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -120,7 +123,7 @@ private fun Content(
                                 Modifier.size(30.dp)
                             )
                         },
-                    ) { eventHandler.invoke(SignUpEvent.OnQueryLoginChange(it))}
+                    ) { eventHandler.invoke(SignUpEvent.OnQueryLoginChange(it)) }
                 }
                 // password
                 Column(
@@ -128,24 +131,10 @@ private fun Content(
                         .fillMaxWidth()
                         .padding(top = 30.dp),
                 ) {
-                    BaseTextFieldUi(
+                    PasswordTextField(
                         label = "Пароль",
                         value = state.queryPassword,
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(R.drawable.lock),
-                                "",
-                                Modifier.size(24.dp)
-                            )
-                        },
-                        trailingIcon = {
-                            Icon(
-                                painter = painterResource(R.drawable.eye),
-                                "",
-                                Modifier.size(24.dp)
-                            )
-                        }
-                    ) { eventHandler.invoke(SignUpEvent.OnQueryPasswordChange(it))}
+                    ) { eventHandler.invoke(SignUpEvent.OnQueryPasswordChange(it)) }
                 }
                 // password2
                 Column(
@@ -153,24 +142,34 @@ private fun Content(
                         .fillMaxWidth()
                         .padding(top = 30.dp),
                 ) {
-                    BaseTextFieldUi(
+                    PasswordTextField(
                         label = "Подтверждение пароля",
                         value = state.queryPasswordConfirm,
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(R.drawable.lock),
-                                "",
-                                Modifier.size(24.dp)
+                    ) { eventHandler.invoke(SignUpEvent.OnQueryPasswordConfirmChange(it)) }
+                }
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp),
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Checkbox(
+                            checked = state.isAdminChecked,
+                            onCheckedChange = { eventHandler.invoke(SignUpEvent.OnAdminCheckedChange(it)) },
+                            colors = CheckboxDefaults.colors(
+                                checkedColor = CustomTheme.colors.secondaryBackground
                             )
-                        },
-                        trailingIcon = {
-                            Icon(
-                                painter = painterResource(R.drawable.eye),
-                                "",
-                                Modifier.size(24.dp)
-                            )
-                        }
-                    ){ eventHandler.invoke(SignUpEvent.OnQueryPasswordConfirmChange(it))}
+                        )
+
+                        Text(
+                            text = "Я продавец",
+                            style = CustomTheme.typography.base,
+                            color = CustomTheme.colors.secondaryBackground
+                        )
+                    }
                 }
                 Column(
                     modifier = Modifier
@@ -188,22 +187,17 @@ private fun Content(
                             color = baseLightPalette.primaryText,
                             modifier = Modifier.weight(2f)
                         )
-                        CircleGreenButton {
+                        CircleGreenButton(
+                            isGreen = state.queryLogin.isNotBlank() && state.queryPassword.isNotBlank() && state.queryPasswordConfirm.isNotBlank()
+                        ) {
                             eventHandler.invoke(SignUpEvent.OnSignUpClick)
                         }
                     }
                 }
+
             }
         }
     }
 }
 
-@Preview(showBackground = true)
-@Composable
-private fun ScreenPreview() {
 
-//    Content(SignUpViewState(),
-//        Unit
-//    )
-
-}

@@ -2,6 +2,7 @@ package com.main.tinkoffsummer2023.ui.screen.auth.signUp
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.main.tinkoffsummer2023.domain.MainRepository
 import com.main.tinkoffsummer2023.ui.ViewEvent
 import com.main.tinkoffsummer2023.ui.ViewState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -19,6 +20,7 @@ data class SignUpViewState(
     val queryLogin: String = "",
     val queryPassword: String = "",
     val queryPasswordConfirm: String = "",
+    val isAdminChecked : Boolean = false,
 
     override val loading: Boolean = false,
     override val error: String? = null,
@@ -29,6 +31,7 @@ sealed interface SignUpEvent : ViewEvent {
     data class OnQueryLoginChange(val query: String) : SignUpEvent
     data class OnQueryPasswordChange(val query: String) : SignUpEvent
     data class OnQueryPasswordConfirmChange(val query: String) : SignUpEvent
+    data class OnAdminCheckedChange(val isChecked: Boolean) : SignUpEvent
 
     object OnSignUpClick : SignUpEvent
 
@@ -45,7 +48,7 @@ sealed interface SignUpAction {
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    // private val mainRepository: MainRepository
+    private val repository: MainRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<SignUpViewState>(SignUpViewState())
@@ -56,19 +59,33 @@ class SignUpViewModel @Inject constructor(
     val action: SharedFlow<SignUpAction?>
         get() = _action.asSharedFlow()
 
-    fun event(signUpEvent: SignUpEvent) {
-        when (signUpEvent) {
-            is SignUpEvent.OnError -> onError(signUpEvent)
-            is SignUpEvent.OnLoading -> onLoading(signUpEvent)
-            is SignUpEvent.OnQueryLoginChange -> onQueryLoginChange(signUpEvent)
-            is SignUpEvent.OnQueryPasswordChange -> onQueryPasswordChange(signUpEvent)
-            is SignUpEvent.OnQueryPasswordConfirmChange -> onQueryPasswordConfirmChange(signUpEvent)
+    fun event(event: SignUpEvent) {
+        when (event) {
+            is SignUpEvent.OnError -> onError(event)
+            is SignUpEvent.OnLoading -> onLoading(event)
+            is SignUpEvent.OnQueryLoginChange -> onQueryLoginChange(event)
+            is SignUpEvent.OnQueryPasswordChange -> onQueryPasswordChange(event)
+            is SignUpEvent.OnQueryPasswordConfirmChange -> onQueryPasswordConfirmChange(event)
             SignUpEvent.OnSignUpClick -> onSignUpClick()
+
+            is SignUpEvent.OnAdminCheckedChange -> onAdminCheckedChange(event)
+        }
+    }
+
+    private fun onAdminCheckedChange(event: SignUpEvent.OnAdminCheckedChange) {
+        viewModelScope.launch {
+            _state.emit(
+                _state.value.copy(
+                    isAdminChecked = event.isChecked
+                )
+            )
         }
     }
 
     private fun onSignUpClick() {
         viewModelScope.launch {
+           repository.registerUser(state.value.queryLogin, state.value.queryPassword, state.value.isAdminChecked)
+
             _action.emit(SignUpAction.NavigateToSignIn)
         }
     }

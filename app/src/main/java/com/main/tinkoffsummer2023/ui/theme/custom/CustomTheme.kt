@@ -54,11 +54,53 @@ fun CustomTheme(
                 true -> baseDarkPalette.primaryText
             }
         ),
+        baseWhite = TextStyle(
+            fontFamily = FontFamily(Font(R.font.montserrat_regular)),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = when (darkTheme) {
+                false -> baseLightPalette.white
+                true -> baseDarkPalette.white
+            }
+        ),
         bottom = TextStyle(
             fontFamily = FontFamily(Font(R.font.montserrat_bold)),
             fontSize = 11.sp,
             fontWeight = FontWeight.Bold
-        )
+        ),
+        baseBold = TextStyle(
+            fontFamily = FontFamily(Font(R.font.montserrat_bold)),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = when (darkTheme) {
+                false -> baseLightPalette.primaryText
+                true -> baseDarkPalette.primaryText
+            }
+        ),
+        baseBoldGreen = TextStyle(
+            fontFamily = FontFamily(Font(R.font.montserrat_bold)),
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold,
+            color = baseLightPalette.secondaryBackground,
+        ),
+        hintBold = TextStyle(
+            fontFamily = FontFamily(Font(R.font.montserrat_bold)),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Normal,
+            color = when (darkTheme) {
+                false -> baseLightPalette.tintColor
+                true -> baseDarkPalette.tintColor
+            }
+        ),
+        boldBig = TextStyle(
+            fontFamily = FontFamily(Font(R.font.montserrat_bold)),
+            fontSize = 30.sp,
+            fontWeight = FontWeight.Bold,
+            color = when (darkTheme) {
+                false -> baseLightPalette.primaryText
+                true -> baseDarkPalette.primaryText
+            }
+        ),
     )
 
     val padding = Padding(

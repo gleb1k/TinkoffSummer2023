@@ -29,7 +29,12 @@ data class Typography(
     val heading: TextStyle,
     val hint: TextStyle,
     val base: TextStyle,
+    val baseWhite : TextStyle,
     val bottom: TextStyle,
+    val baseBold : TextStyle,
+    val baseBoldGreen : TextStyle,
+    val hintBold : TextStyle,
+    val boldBig : TextStyle,
 )
 
 data class Padding (

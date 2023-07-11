@@ -94,15 +94,15 @@ fun Content(
             )
             Text(
                 text = "CкороХод",
-                fontWeight = FontWeight(800),
-                fontFamily = FontFamily(Font(R.font.montserrat_regular)),
-                fontSize = 40.sp,
+                style = CustomTheme.typography.heading,
+                color = CustomTheme.colors.secondaryBackground
             )
             Text(
                 text = "Место быстрых покупок",
                 fontWeight = FontWeight(700),
-                fontFamily = FontFamily(Font(R.font.montserrat_regular)),
-                fontSize = 20.sp
+                fontFamily = FontFamily(Font(R.font.montserrat_bold)),
+                fontSize = 18.sp,
+                color = CustomTheme.colors.tintColor
             )
 
         }
@@ -120,7 +120,7 @@ fun Content(
                 ClickableText(
                     text = AnnotatedString("Зарегистрироваться"),
                     onClick = { eventHandler.invoke(StartEvent.OnSignUpClick) },
-                    style = CustomTheme.typography.base,
+                    style = CustomTheme.typography.baseBoldGreen,
                 )
             }
             BaseGreenButton(
@@ -136,7 +136,7 @@ fun Content(
                 ClickableText(
                     text = AnnotatedString("Перейти к каталогу"),
                     onClick = { eventHandler.invoke(StartEvent.OnCatalogClick) },
-                    style = CustomTheme.typography.base
+                    style = CustomTheme.typography.hint
                 )
             }
 

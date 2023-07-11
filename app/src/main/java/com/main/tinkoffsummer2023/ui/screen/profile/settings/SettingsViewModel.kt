@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import com.main.tinkoffsummer2023.ui.ViewEvent
 import com.main.tinkoffsummer2023.ui.ViewState
 import com.main.tinkoffsummer2023.ui.model.Category
-import com.main.tinkoffsummer2023.ui.model.MockTempConstants
+import com.main.tinkoffsummer2023.ui.model.MockBackend
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.PersistentList
 import javax.annotation.concurrent.Immutable
@@ -13,7 +13,7 @@ import javax.inject.Inject
 
 @Immutable
 data class SettingsViewState(
-    val categories: PersistentList<Category> = MockTempConstants.categories,
+    val categories: PersistentList<Category> = MockBackend.categories,
 
     override val loading: Boolean = false,
     override val error: String? = null,

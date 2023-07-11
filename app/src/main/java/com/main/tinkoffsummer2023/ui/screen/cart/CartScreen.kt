@@ -1,10 +1,12 @@
 package com.main.tinkoffsummer2023.ui.screen.cart
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -43,13 +45,11 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.main.tinkoffsummer2023.R
 import com.main.tinkoffsummer2023.ui.model.CartProduct
-import com.main.tinkoffsummer2023.ui.model.MockTempConstants
-import com.main.tinkoffsummer2023.ui.model.Product
 import com.main.tinkoffsummer2023.ui.navigation.BottomScreen
 import com.main.tinkoffsummer2023.ui.navigation.Screen
-import com.main.tinkoffsummer2023.ui.screen.catalog.CatalogEvent
 import com.main.tinkoffsummer2023.ui.screen.util.BaseCounter
 import com.main.tinkoffsummer2023.ui.screen.util.BaseGreenButton
+import com.main.tinkoffsummer2023.ui.screen.util.BaseInfoColumn
 import com.main.tinkoffsummer2023.ui.screen.util.BaseTopAppBar
 import com.main.tinkoffsummer2023.ui.theme.custom.CustomTheme
 import com.main.tinkoffsummer2023.ui.theme.custom.baseLightPalette
@@ -62,9 +62,10 @@ private fun CartScreenActions(
     LaunchedEffect(viewAction) {
         when (viewAction) {
             null -> Unit
-            is CartAction.NavigateToProduct -> navController.navigate(Screen.Product.route)
+            is CartAction.NavigateToProduct -> navController.navigate("product/${viewAction.productId}")
             CartAction.NavigateBack -> navController.navigateUp()
-            CartAction.NavigateToCatalog -> navController.navigate(BottomScreen.Category.route)
+            CartAction.NavigateToCatalog -> navController.navigateUp()
+            CartAction.NavigateToOrderAddress -> navController.navigate(Screen.OrderAddress.route)
         }
     }
 }
@@ -127,35 +128,81 @@ fun NotEmptyCartScreen(
                     }
                 }
             )
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(0.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth(),
+            Box(
+                Modifier.fillMaxSize(),
+                contentAlignment = Alignment.BottomCenter,
             ) {
-                item {
-                    Column(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = CustomTheme.padding.horizontal),
-                        horizontalAlignment = Alignment.Start
-                    ) {
-                        Text(
-                            text = "Товары (${state.cartProducts.size})",
-                            style = CustomTheme.typography.heading,
-                        )
-                    }
-                }
-                itemsIndexed(state.cartProducts) { index, product ->
-
-                    CartItem(product)
-
-                    if (index < state.cartProducts.size)
-                        Divider(
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(0.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxSize(),
+                ) {
+                    item {
+                        Column(
                             Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = CustomTheme.padding.horizontal)
-                        )
+                                .padding(horizontal = CustomTheme.padding.horizontal),
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                            Text(
+                                text = "Товары (${state.cartProducts.size})",
+                                style = CustomTheme.typography.boldBig,
+                            )
+                        }
+                    }
+                    itemsIndexed(state.cartProducts) { index, product ->
+                        CartItem(product, eventHandler)
+
+                        if (index < state.cartProducts.size)
+                            Divider(
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = CustomTheme.padding.horizontal)
+                            )
+                    }
+                    item {
+                        Spacer(modifier = Modifier.height(90.dp))
+                    }
+                }
+                Box(
+                    modifier = Modifier.padding(
+                        vertical = CustomTheme.padding.horizontal
+                    ),
+                ) {
+                    BaseInfoColumn(
+                        content = {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Start,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(
+                                ) {
+                                    Text(
+                                        text = "Итоговая стоимость",
+                                        style = CustomTheme.typography.hint,
+                                    )
+                                    Text(
+                                        text = "${state.cartProducts.sumOf { it.product.price }} бонуса",
+                                        style = CustomTheme.typography.baseBold,
+                                    )
+                                }
+                                BaseGreenButton(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(40.dp)
+                                        .padding(start = 24.dp),
+                                    text = "Оформить",
+                                    textStyle = CustomTheme.typography.baseWhite,
+                                ) {
+                                    eventHandler.invoke(CartEvent.OnCheckoutOrderClick)
+                                }
+                            }
+                        }
+                    )
+
                 }
             }
         }
@@ -167,6 +214,7 @@ fun NotEmptyCartScreen(
 @Composable
 private fun CartItem(
     cartProduct: CartProduct,
+    eventHandler: (CartEvent) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -191,7 +239,10 @@ private fun CartItem(
                 .clip(
                     RoundedCornerShape(2.dp)
                 )
-                .size(128.dp),
+                .size(128.dp)
+                .clickable {
+                         eventHandler.invoke(CartEvent.OnProductClick(cartProduct.product.id))
+                },
         )
         Column(
             modifier = Modifier
@@ -215,7 +266,7 @@ private fun CartItem(
                     fontWeight = FontWeight.Normal,
                     color = baseLightPalette.secondaryText
                 ),
-                onClick = {}
+                onClick = { eventHandler.invoke(CartEvent.OnProductClick(cartProduct.product.id))}
             )
             Box(modifier = Modifier.align(Alignment.End)) {
                 BaseCounter(count = cartProduct.count)

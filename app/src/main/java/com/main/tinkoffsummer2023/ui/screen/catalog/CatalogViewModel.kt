@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.main.tinkoffsummer2023.domain.MainRepository
 import com.main.tinkoffsummer2023.ui.ViewEvent
 import com.main.tinkoffsummer2023.ui.ViewState
-import com.main.tinkoffsummer2023.ui.model.MockTempConstants
 import com.main.tinkoffsummer2023.ui.model.Product
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.PersistentList
@@ -40,8 +39,9 @@ sealed interface CatalogEvent : ViewEvent {
     object OnFilterClick : CatalogEvent
     object OnBackClick : CatalogEvent
 
-    object OnLoad : CatalogEvent
+    data class OnLoad(val query: String) : CatalogEvent
 
+    data class OnSearchClick(val query: String) : CatalogEvent
     data class OnLoading(val isLoading: Boolean) : CatalogEvent
     data class OnError(val errorMessage: String?) : CatalogEvent
 }
@@ -75,18 +75,32 @@ class CatalogViewModel @Inject constructor(
             CatalogEvent.OnFilterClick -> onFilterClick()
             is CatalogEvent.OnAddToCartClick -> onAddToCartClick(event)
             CatalogEvent.OnBackClick -> onBackClick()
-            CatalogEvent.OnLoad -> onLoad()
+            is CatalogEvent.OnLoad -> onLoad(event)
+            is CatalogEvent.OnSearchClick -> onSearchClick(event)
         }
     }
 
-    private fun onLoad() {
+    private fun onLoad(event: CatalogEvent.OnLoad) {
         viewModelScope.launch {
-            _state.emit(
-                _state.value.copy(
-                    //temp
-                    products = repository.getProducts().toPersistentList()
+//            onQueryChange(event)
+        }
+    }
+
+    private fun onSearchClick(event: CatalogEvent.OnSearchClick) {
+        viewModelScope.launch {
+            try {
+                onLoading(CatalogEvent.OnLoading(true))
+                _state.emit(
+                    _state.value.copy(
+                        products = repository.searchProducts(event.query)!!.toPersistentList(),
+                    )
                 )
-            )
+                onError(CatalogEvent.OnError(null))
+            } catch (throwable: Throwable) {
+                onError(CatalogEvent.OnError("Loading error :c"))
+            } finally {
+                onLoading(CatalogEvent.OnLoading(false))
+            }
         }
     }
 

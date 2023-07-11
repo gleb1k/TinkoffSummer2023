@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.main.tinkoffsummer2023.ui.model.MockBackend
 import com.main.tinkoffsummer2023.ui.navigation.BottomScreen
 import com.main.tinkoffsummer2023.ui.screen.util.BaseGreenButton
 import com.main.tinkoffsummer2023.ui.screen.util.BaseInfoColumn
@@ -103,8 +104,9 @@ private fun Content(
                             style = CustomTheme.typography.base
                         )
                         Text(
-                            text = "15 350",
+                            text = MockBackend.usersDataBase[0].score.toString(),
                             style = CustomTheme.typography.heading,
+                            color = CustomTheme.colors.secondaryBackground,
                             modifier = Modifier.padding(top = 8.dp)
                         )
                     }

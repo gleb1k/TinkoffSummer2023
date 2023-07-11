@@ -4,12 +4,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.main.tinkoffsummer2023.R
 
-//todo хз?
-enum class Screens {
-    Sign_up,
-}
 
-//todo nasral, надо вынести в константу!
 sealed class Screen(
     val route: String,
 ) {
@@ -30,11 +25,11 @@ sealed class Screen(
 
     // region catalog
     object Product : Screen(
-        route = "product",
+        route = "product/{productId}",
     )
 
     object Catalog : Screen(
-        route = "catalog",
+        route = "catalog?query={query}",
     )
 
     object Filter : Screen(
@@ -55,6 +50,22 @@ sealed class Screen(
         route = "settings"
     )
     // endregion
+
+    // region order
+    object OrderAddress : Screen(
+        route = "order_address"
+    )
+
+    object Ordering : Screen(
+        route = "ordering"
+    )
+
+    object OrderIsProcessed : Screen(
+        route = "order_is_processed"
+    )
+
+    // endregion
+
 
 }
 
@@ -88,6 +99,12 @@ sealed class BottomScreen(
         route = "profile",
         name = R.string.profile,
         icon = R.drawable.user_outlined
+    )
+
+    object MyProducts : BottomScreen(
+        route = "my_products_admin",
+        name = R.string.my_products,
+        icon = R.drawable.category
     )
 
 }

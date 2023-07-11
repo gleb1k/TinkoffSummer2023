@@ -35,6 +35,7 @@ import com.main.tinkoffsummer2023.ui.navigation.BottomScreen
 import com.main.tinkoffsummer2023.ui.screen.util.BaseTextFieldUi
 import com.main.tinkoffsummer2023.ui.screen.util.BaseTopAppBar
 import com.main.tinkoffsummer2023.ui.screen.util.CircleGreenButton
+import com.main.tinkoffsummer2023.ui.screen.util.PasswordTextField
 import com.main.tinkoffsummer2023.ui.theme.custom.CustomTheme
 import com.main.tinkoffsummer2023.ui.theme.custom.baseLightPalette
 
@@ -71,6 +72,7 @@ fun SignInScreen(
         navController,
         action
     )
+
 }
 
 @Composable
@@ -112,8 +114,6 @@ private fun Content(
                     BaseTextFieldUi(
                         label = "Номер телефона или Email",
                         value = state.queryLogin,
-                        //todo спросить у илюхи
-                        // onValueChange = eventHandler.invoke(SignUpEvent.OnQueryLoginChange),
                         leadingIcon = {
                             Icon(
                                 painter = painterResource(R.drawable.user_filled),
@@ -131,24 +131,10 @@ private fun Content(
                         .fillMaxWidth()
                         .padding(top = 30.dp),
                 ) {
-                    BaseTextFieldUi(
+                    PasswordTextField(
                         label = "Пароль",
                         value = state.queryPassword,
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(R.drawable.lock),
-                                "",
-                                Modifier.size(24.dp)
-                            )
-                        },
-                        trailingIcon = {
-                            Icon(
-                                painter = painterResource(R.drawable.eye),
-                                "",
-                                Modifier.size(24.dp)
-                            )
-                        }
-                    ) { eventHandler.invoke(SignInEvent.OnQueryPasswordChange(it)) }
+                    ){ eventHandler.invoke(SignInEvent.OnQueryPasswordChange(it)) }
                 }
                 Column(
                     modifier = Modifier
@@ -182,7 +168,9 @@ private fun Content(
                             color = baseLightPalette.primaryText,
                             modifier = Modifier.weight(2f)
                         )
-                        CircleGreenButton {
+                        CircleGreenButton(
+                            isGreen = state.queryLogin.isNotBlank() && state.queryPassword.isNotBlank()
+                        ) {
                             eventHandler.invoke(SignInEvent.OnSignInClick)
                         }
                     }

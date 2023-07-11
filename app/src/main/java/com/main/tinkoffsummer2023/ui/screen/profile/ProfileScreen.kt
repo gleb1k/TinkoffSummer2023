@@ -1,10 +1,12 @@
 package com.main.tinkoffsummer2023.ui.screen.profile
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,6 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.main.tinkoffsummer2023.R
 import com.main.tinkoffsummer2023.ui.navigation.Screen
+import com.main.tinkoffsummer2023.ui.screen.util.BaseGreenButton
 import com.main.tinkoffsummer2023.ui.screen.util.BaseInfoColumn
 import com.main.tinkoffsummer2023.ui.screen.util.BaseTopAppBar
 import com.main.tinkoffsummer2023.ui.screen.util.CircleGreenButton
@@ -35,15 +38,16 @@ import com.main.tinkoffsummer2023.ui.theme.custom.CustomTheme
 @Composable
 private fun ProfileScreenActions(
     navController: NavController,
-    viewAction: ProfileAction?
+    viewAction: ProfileAction?,
 ) {
     LaunchedEffect(viewAction) {
         when (viewAction) {
-            null -> Unit
             ProfileAction.NavigateTheme -> navController.navigate(Screen.Settings.route)
             ProfileAction.NavigateToAboutApp -> navController.navigate(Screen.AboutApp.route)
             ProfileAction.NavigateToBalance -> navController.navigate(Screen.Balance.route)
             ProfileAction.NavigateBack -> navController.navigateUp()
+            ProfileAction.NavigateToLogin -> navController.navigate(Screen.Start.route)
+            null -> Unit
         }
     }
 }
@@ -52,27 +56,169 @@ private fun ProfileScreenActions(
 @Composable
 fun ProfileScreen(
     navController: NavController,
-    viewModel: ProfileViewModel = hiltViewModel()
+    viewModel: ProfileViewModel = hiltViewModel(),
 ) {
 
     val state by viewModel.state.collectAsStateWithLifecycle()
     val action by viewModel.action.collectAsStateWithLifecycle(null)
 
-    Content(
-        state,
-        viewModel::event
-    )
+    LaunchedEffect(Unit) {
+        viewModel.event(ProfileEvent.OnLoad)
+    }
 
     ProfileScreenActions(
         navController,
         action
     )
+
+    if (state.user != null) {
+        Content(
+            state,
+            viewModel::event
+        )
+    } else {
+        UnAuthProfileScreen(
+            state,
+            viewModel::event
+        )
+    }
+}
+
+@Composable
+private fun UnAuthProfileScreen(
+    state: ProfileViewState,
+    eventHandler: (ProfileEvent) -> Unit,
+) {
+    Surface(color = CustomTheme.colors.primaryBackground) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            BaseTopAppBar(
+                {
+                    IconButton(onClick = {
+                        eventHandler.invoke(ProfileEvent.OnBackClick)
+                    }) {
+                        Icon(Icons.Filled.ArrowBack, "backIcon")
+                    }
+                },
+            )
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp),
+            ) {
+                Text(
+                    text = "Войдите или зарегистрируйтесь",
+                    style = CustomTheme.typography.boldBig
+                )
+                Image(
+                    painter = painterResource(id = R.drawable.ufo),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .size(180.dp)
+                        .padding()
+                )
+                BaseGreenButton(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 0.dp, vertical = 8.dp)
+                        .height(50.dp),
+                    text = "Войти или зарегистрироваться",
+                    textStyle = CustomTheme.typography.baseWhite
+                ) {
+                    eventHandler.invoke(ProfileEvent.OnAuthorize)
+                }
+            }
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                BaseInfoColumn(
+                    content = {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.settings),
+                                    contentDescription = "",
+                                    Modifier.size(24.dp)
+                                )
+                                Text(
+                                    text = "О приложении",
+                                    style = CustomTheme.typography.base,
+                                    modifier = Modifier.padding(start = 6.dp)
+                                )
+                            }
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.right_arrow_small),
+                                    contentDescription = "",
+                                    Modifier.size(28.dp)
+                                )
+                            }
+                        }
+
+                    }, isClickable = true,
+                    onClick = {
+                        eventHandler.invoke(ProfileEvent.OnAboutAppClick)
+                    }
+                )
+                BaseInfoColumn(
+                    content = {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.home),
+                                    contentDescription = "",
+                                    Modifier.size(24.dp)
+                                )
+                                Text(
+                                    text = "Выбор темы приложения",
+                                    style = CustomTheme.typography.base,
+                                    modifier = Modifier.padding(start = 6.dp)
+                                )
+                            }
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.End
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.right_arrow_small),
+                                    contentDescription = "",
+                                    Modifier.size(28.dp)
+                                )
+                            }
+                        }
+                    }, isClickable = true,
+                    onClick = {
+                        eventHandler.invoke(ProfileEvent.OnThemeClick)
+                    }
+                )
+            }
+        }
+    }
 }
 
 @Composable
 private fun Content(
     state: ProfileViewState,
-    eventHandler: (ProfileEvent) -> Unit
+    eventHandler: (ProfileEvent) -> Unit,
 ) {
     Surface(color = CustomTheme.colors.primaryBackground) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -118,17 +264,20 @@ private fun Content(
                         Text(
                             text = "Редактировать",
                             style = CustomTheme.typography.base,
+                            color = CustomTheme.colors.secondaryBackground,
                             modifier = Modifier
                                 .padding(bottom = 4.dp)
                         )
                     }
                     BaseInfoColumn(
                         content = {
-                            Text(text = "Иван Иванович", style = CustomTheme.typography.base)
-                            Text(text = "iivan@gmail.ru", style = CustomTheme.typography.hint)
+                            if (state.user!!.isAdmin)
+                                Text(text = "ООО \"${state.user.name}\"", style = CustomTheme.typography.base)
+                            else
+                                Text(text = state.user.name, style = CustomTheme.typography.base)
                             Divider()
                             Text(
-                                text = "+7 (987) 654 33 21",
+                                text = state.user.login,
                                 style = CustomTheme.typography.hint
                             )
                         }
@@ -151,7 +300,11 @@ private fun Content(
                                 }
                             }
 
-                            Text(text = "15 350", style = CustomTheme.typography.heading)
+                            Text(
+                                text = state.user!!.score.toString(),
+                                style = CustomTheme.typography.heading,
+                                color = CustomTheme.colors.secondaryBackground
+                            )
                         }
 
                     )

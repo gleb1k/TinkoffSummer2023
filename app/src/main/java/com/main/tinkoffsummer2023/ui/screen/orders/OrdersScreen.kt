@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.IconButton
@@ -86,6 +87,7 @@ private fun Content(
             BaseTopAppBar(
                 {
                     IconButton(onClick = {
+                        eventHandler.invoke(OrdersEvent.OnBackClick)
                     }) {
                         Icon(Icons.Filled.ArrowBack, "backIcon")
                     }
@@ -147,28 +149,36 @@ fun OrderItem(
                 Box(
                     Modifier.padding(vertical = 8.dp)
                 ) {
-                    OrderStatusUi(text = order.status, color = CustomTheme.colors.red)
+                    OrderStatusUi(text = order.status, color = CustomTheme.colors.blue)
                 }
                 Text(
                     text = "Ожидаемая дата доставки: ${order.finishTime}",
                     style = CustomTheme.typography.hint
                 )
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(order.product.images[0])
-                        .crossfade(true)
-                        .build(),
-                    placeholder = painterResource(R.drawable.ic_launcher_foreground),
-                    error = painterResource(R.drawable.main_icon),
-                    contentDescription = "Заказ",
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .clip(
-                            RoundedCornerShape(2.dp)
+                LazyRow(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(order.products) {
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(it.product.images[0])
+                                .crossfade(true)
+                                .build(),
+                            placeholder = painterResource(R.drawable.ic_launcher_foreground),
+                            error = painterResource(R.drawable.main_icon),
+                            contentDescription = "Заказ",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .clip(
+                                    RoundedCornerShape(2.dp)
+                                )
+                                .size(100.dp)
+                                .padding(top = 8.dp),
                         )
-                        .size(100.dp)
-                        .padding(top = 8.dp),
-                )
+                    }
+                }
+
+
             }
         },
         isClickable = true,
@@ -204,7 +214,9 @@ fun EmptyOrdersScreen(
                 .padding(horizontal = 46.dp, vertical = 8.dp)
                 .height(52.dp),
             text = "Перейти к покупкам"
-        ) { }
+        ) {
+            eventHandler.invoke(OrdersEvent.OnBackClick)
+        }
     }
 }
 

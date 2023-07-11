@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -86,16 +87,17 @@ private fun SettingsItemUi(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(text = text, style = CustomTheme.typography.base)
-        IconButton(onClick = { onClick.invoke() }) {
+        IconButton(onClick = { onClick.invoke()}) {
             if (isChecked)
                 Image(
-                    painter = painterResource(id = R.drawable.check_mark),
-                    contentDescription = ""
-                )
-            else
+                    painter = painterResource(id = R.drawable.checked),
+                    contentDescription = "",
+                    modifier = Modifier.size(30.dp)
+                ) else
                 Image(
                     painter = painterResource(id = R.drawable.circle_white),
-                    contentDescription = ""
+                    contentDescription = "",
+                    modifier = Modifier.size(30.dp)
                 )
         }
     }
