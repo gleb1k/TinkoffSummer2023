@@ -161,16 +161,24 @@ private fun Content(
                     )
                 }
             }
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 12.dp),
-            ) {
-                if (state.products.isEmpty())
+            if (state.products.isEmpty())
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                ) {
                     EmptyCatalogScreen(eventHandler)
-                else {
+                }
+            else {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp),
+                ) {
+
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -192,7 +200,6 @@ private fun Content(
                         }
                     }
                 }
-
             }
         }
     }
@@ -221,6 +228,7 @@ private fun ProductItem(
                     onImageClick.invoke()
                 }
                 .fillMaxWidth()
+                .size(160.dp)
         )
         Text(
             text = product.name,
@@ -272,6 +280,9 @@ fun EmptyCatalogScreen(
                 Text(
                     text = "Простите, по Вашему запросу товаров сейчас нет",
                     style = CustomTheme.typography.base,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp)
                 )
                 BaseGreenButton(
                     modifier = Modifier

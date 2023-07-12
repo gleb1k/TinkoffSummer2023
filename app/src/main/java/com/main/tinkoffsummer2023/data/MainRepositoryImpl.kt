@@ -10,9 +10,6 @@ import com.main.tinkoffsummer2023.ui.model.MockBackend
 import com.main.tinkoffsummer2023.ui.model.Order
 import com.main.tinkoffsummer2023.ui.model.Product
 import com.main.tinkoffsummer2023.ui.model.User
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody.Companion.toRequestBody
-import org.json.JSONObject
 import java.util.Locale
 import javax.inject.Inject
 
@@ -63,12 +60,14 @@ class MainRepositoryImpl @Inject constructor(
 //                1
 //            )
 //        )
-        MockBackend.cartProductDataBase.add(
-            CartProduct(
-                product,
-                1
+        if (MockBackend.usersDataBase.isNotEmpty()) {
+            MockBackend.cartProductDataBase.add(
+                CartProduct(
+                    product,
+                    1
+                )
             )
-        )
+        }
     }
 
     override suspend fun getCartProducts(): List<CartProduct> {
@@ -125,15 +124,26 @@ class MainRepositoryImpl @Inject constructor(
 //
 //        api.singUpUser(requestBody)
 
-        MockBackend.usersDataBase.add(
-            User(
-                login,
-                password,
-                token = login + password,
-                isAdmin = isAdmin,
+        if (isAdmin)
+            MockBackend.usersDataBase.add(
+                User(
+                    login,
+                    password,
+                    token = login + password,
+                    isAdmin = isAdmin,
+                    score = 1000,
+                )
             )
-        )
-        val temp = MockBackend.usersDataBase[0]
+        else
+            MockBackend.usersDataBase.add(
+                User(
+                    login,
+                    password,
+                    token = login + password,
+                    isAdmin = isAdmin,
+                    score = 5000,
+                )
+            )
     }
 
     override suspend fun loginUser(login: String, password: String): Boolean {

@@ -13,6 +13,8 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.IconButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -26,7 +28,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
@@ -36,7 +42,6 @@ import com.main.tinkoffsummer2023.ui.model.MockBackend
 import com.main.tinkoffsummer2023.ui.model.Product
 import com.main.tinkoffsummer2023.ui.screen.util.BaseGreenButton
 import com.main.tinkoffsummer2023.ui.screen.util.BaseTopAppBar
-import com.main.tinkoffsummer2023.ui.screen.util.BuyGreenButton
 import com.main.tinkoffsummer2023.ui.theme.custom.CustomTheme
 
 @Composable
@@ -76,7 +81,7 @@ fun MyProductsScreen(
                     items(myProducts) {
                         ProductItem(
                             it,
-                            { navController.navigate("product/${it.id}" )},
+                            { navController.navigate("product/${it.id}") },
                             { }
                         )
                     }
@@ -135,7 +140,25 @@ private fun ProductItem(
             text = product.name,
             style = CustomTheme.typography.base,
         )
-        BuyGreenButton(product.price) { onButtonClick.invoke() }
+        Button(
+            onClick = { },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(34.dp),
+            shape = RoundedCornerShape(18.dp),
+            colors = ButtonDefaults.buttonColors(
+                backgroundColor = CustomTheme.colors.secondaryBackground
+            )
+        ) {
+            Text(
+                text = "Редактировать",
+                fontWeight = FontWeight(700),
+                fontFamily = FontFamily(Font(R.font.montserrat_regular)),
+                fontSize = 13.sp,
+                color = CustomTheme.colors.secondaryText
+            )
+
+        }
     }
 }
 

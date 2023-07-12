@@ -64,7 +64,7 @@ private fun CartScreenActions(
             null -> Unit
             is CartAction.NavigateToProduct -> navController.navigate("product/${viewAction.productId}")
             CartAction.NavigateBack -> navController.navigateUp()
-            CartAction.NavigateToCatalog -> navController.navigateUp()
+            CartAction.NavigateToCatalog -> navController.navigate(Screen.Catalog.route)
             CartAction.NavigateToOrderAddress -> navController.navigate(Screen.OrderAddress.route)
         }
     }

@@ -79,27 +79,29 @@ fun CustomNavHost(
 
 //    val isAdmin = MockBackend.usersDataBase[0].isAdmin
 
-//    val bottomScreens = if (isAdmin) {
-//        listOf(
-//            BottomScreen.Orders,
-//            BottomScreen.Category,
-//            BottomScreen.MyProducts,
-//            BottomScreen.Profile
-//        )
-//    } else {
+    val bottomScreens = if (MockBackend.usersDataBase.isNotEmpty() && MockBackend.usersDataBase[0].isAdmin) {
+        listOf(
+            BottomScreen.Orders,
+            BottomScreen.Category,
+            //почему-то съехало(
+            BottomScreen.MyProducts,
+            BottomScreen.Profile
+        )
+    } else {
+        listOf(
+            BottomScreen.Orders,
+            BottomScreen.Category,
+            BottomScreen.Cart,
+            BottomScreen.Profile
+        )
+    }
+//    val bottomScreens =
 //        listOf(
 //            BottomScreen.Orders,
 //            BottomScreen.Category,
 //            BottomScreen.Cart,
 //            BottomScreen.Profile
 //        )
-//    }
-    val bottomScreens = listOf(
-        BottomScreen.Orders,
-        BottomScreen.Category,
-        BottomScreen.Cart,
-        BottomScreen.Profile
-    )
 
     Scaffold(
         bottomBar = {
@@ -117,7 +119,7 @@ fun CustomNavHost(
                                     Icon(
                                         painter = painterResource(id = screen.icon),
                                         contentDescription = null,
-                                        modifier = Modifier.size(26.dp)
+                                        modifier = Modifier.size(25.dp)
                                     )
                                 },
                                 label = {
@@ -141,7 +143,7 @@ fun CustomNavHost(
                                         // Restore state when reselecting a previously selected item
                                         restoreState = true
                                     }
-                                }
+                                },
                             )
                         }
                     }
@@ -156,7 +158,7 @@ fun CustomNavHost(
         ) {
 
             composable(BottomScreen.Cart.route) {
-                if (MockBackend.usersDataBase[0].isAdmin)
+                if (MockBackend.usersDataBase.isNotEmpty() && MockBackend.usersDataBase[0].isAdmin)
                     MyProductsScreen(navController)
                 else
                     CartScreen(navController)
@@ -196,7 +198,7 @@ fun CustomNavHost(
             composable(Screen.Ordering.route) { OrderingScreen(navController) }
             composable(Screen.OrderIsProcessed.route) { OrderIsProcessedScreen(navController) }
 
-//            composable(BottomScreen.MyProducts.route) { MyProductsScreen(navController) }
+            composable(BottomScreen.MyProducts.route) { MyProductsScreen(navController) }
         }
     }
 }
